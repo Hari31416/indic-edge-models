@@ -3,7 +3,7 @@
 ## Scope and context
 
 - Before changing project scope, read [context.md](context.md) for goals and hardware/data constraints. User instructions take precedence over historical planning notes.
-- Before selecting models or datasets, read the relevant subproject README. Consult [VALIDATION_AND_OPTIONS.md](VALIDATION_AND_OPTIONS.md) for the earlier assessment, then verify current source information when needed.
+- Before selecting models or datasets, read the relevant subproject README. Consult [SUGGESTIONS_AND_OPTIONS.md](SUGGESTIONS_AND_OPTIONS.md) for the consolidated assessment and deferred options, then verify current source information when needed.
 - Work inside the relevant subproject and read its `AGENTS.md`. Embeddings is the first implementation priority; reranking and translation remain deferred until embeddings is complete or the user changes the order.
 - Evaluate the actual browser artifact. Distinguish reference-model results, export parity, and measured browser performance.
 

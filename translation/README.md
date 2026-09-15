@@ -71,6 +71,4 @@ Add implementation and experiment records here later. Keep downloaded corpora, c
 ## Background
 
 - [Project context](../context.md)
-- [Validation and options](../VALIDATION_AND_OPTIONS.md)
-- [Astra suggestions](../ASTRA_SUGGESTIONS.md)
-- [Grok suggestions](../GROK_SUGGESTIONS.md)
+- [Suggestions and options](../SUGGESTIONS_AND_OPTIONS.md)

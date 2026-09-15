@@ -1,18 +1,28 @@
-# Indic edge models: validation and options
+# Indic edge models: suggestions and options
 
-Research date: 15 September 2026.
+Consolidated on 15 September 2026.
 
 ## Recommendation
 
 Keep the embedder first and make the reranker conditional. Run a small comparison before choosing E5 as the training base. Test two opportunities separately: improved retrieval for Romanized queries, and similar retrieval quality in a substantially smaller language-specific browser download.
 
-Astra is the better starting plan. Grok identifies useful failure conditions, but treats several hypotheses as established facts and understates both your existing translation work and the alternatives.
+Current priority: complete the embedding project first. Reranking and pair-specific translation are deferred. Speech is a future planning option, not an active implementation project. Language coverage, model choice, and numerical budgets remain provisional.
 
 This is a source and feasibility assessment. I inspected local documentation and current primary sources; I did not train models, rerun your exports, or independently reproduce model-card scores. Suggested budgets and thresholds below are experiment choices, not measured results.
 
+## How to use this document
+
+Use this file for project choices, evidence, and alternatives. For the current implementation sequence, read the relevant roadmap:
+
+- [Embeddings](embeddings/STEPS.md): first project.
+- [Reranking](rerank/STEPS.md): after embeddings, conditional on candidate recall and ranking headroom.
+- [Pair-specific translation](translation/STEPS.md): after embeddings; its order relative to reranking remains open.
+
+[context.md](context.md) records the constraints. [AGENTS.md](AGENTS.md#experiment-records) defines how each subproject records experiments, outputs, and resulting decisions. Update roadmaps from those records rather than treating the suggestions below as fixed recipes.
+
 ## What you want and already have
 
-Your context specifies a model-first project, fully local browser inference, public training data, a solo developer, an M4 Pro, and intermittent access to two 16 GB T4s. It excludes a new foundation LLM, private-corpus verticals, speech, and a cloud API as the main release. Nothing requires an 80 MB ceiling or mobile-first deployment; those were suggestions. Mac RAM, target browser/device, languages you can inspect, and intended release terms remain unspecified.
+Your context specifies a model-first project, fully local browser inference, public training data, a solo developer, an M4 Pro, and intermittent access to two 16 GB T4s. Current implementation excludes a new foundation LLM, private-corpus verticals, speech, and a cloud API as the main release. The final section outlines a possible later speech extension. Nothing requires an 80 MB ceiling or mobile-first deployment; those were suggestions. Mac RAM, target browser/device, languages you can inspect, and intended release terms remain unspecified.
 
 The related repositories contain useful prior work:
 
@@ -21,24 +31,24 @@ The related repositories contain useful prior work:
 - [Size optimization analysis](/Users/hari/Desktop/sandbox/indictrans2-onnx-export/ONNX_SIZE_OPTIMIZATION.md) already investigates duplicated tied weights, decoder duplication, tokenizer payloads, and direction-specific vocabulary pruning.
 - [Browser benchmarks](/Users/hari/Desktop/sandbox/indictrans2-onnx-export/LIVE_BENCHMARKS.md) contains conflicts: its prose says INT8 WebGPU, base FP32 WASM, and 1B FP32 WebGPU configurations were excluded, while its table marks those configurations completed. Those results need reconciliation against raw runs before reuse.
 
-Thus, Grok's description of another failed 1B export is unsupported. You have substantial implementation work. Fixture parity establishes agreement on tested examples, not translation quality or universal browser compatibility.
+This is substantial implementation work to reuse. Fixture parity establishes agreement on tested examples, not translation quality or universal browser compatibility.
 
-## Validation of the two suggestions
+## Conclusions retained after validation
 
-| Proposal or claim                                         | Assessment                 | Consequence                                                                                          |
-| --------------------------------------------------------- | -------------------------- | ---------------------------------------------------------------------------------------------------- |
-| Fine-tune an existing small retriever                     | Sound                      | Establish an unchanged, exported baseline first.                                                     |
-| Romanized and mixed-script retrieval is promising         | Plausible, unproven        | Measure the gap; do not assume every current model fails.                                            |
-| Only Romanized specialization can win                     | Too strong                 | Compression, latency, and specific cross-language directions can also matter.                        |
-| Start with English and Hindi                              | Sensible provisional scope | Prefer a language you can inspect; add a second script after a useful result.                        |
-| Grok's 80 MB budget alongside its E5-small recommendation | Unresolved size mismatch   | E5's published INT8 ONNX alone is about 118 MB; the budget needs measurement and a compression plan. |
-| Reduce MiniLM layers to get a tiny download               | Incomplete                 | Vocabulary can dominate storage even when transformer compute is small.                              |
-| Aksharantar and BPCC supply retrieval training            | Only indirectly            | Transliteration and translation pairs provide alignment, not search relevance.                       |
-| Dakshina is gold retrieval evaluation                     | Incorrect                  | It supplies human Romanizations, not query-to-passage relevance judgments.                           |
-| Use MIRACL as independent evaluation                      | Needs qualification        | Its held-out split is useful, but E5 trained on its training split.                                  |
-| Add a reranker after examining top-20 recall              | Sound                      | It only helps when relevant passages enter the candidate set.                                        |
-| A 40–80 MB translator can rival IndicTrans2               | An ambitious target        | Requires actual compression/distillation and evaluation, not ordinary fine-tuning.                   |
-| There is no credible third project                        | Unsupported                | Code-mixed tagging and bounded OCR are feasible alternatives.                                        |
+| Proposal or claim                                    | Assessment                 | Consequence                                                                                          |
+| ---------------------------------------------------- | -------------------------- | ---------------------------------------------------------------------------------------------------- |
+| Fine-tune an existing small retriever                | Sound                      | Establish an unchanged, exported baseline first.                                                     |
+| Romanized and mixed-script retrieval is promising    | Plausible, unproven        | Measure the gap; do not assume every current model fails.                                            |
+| Only Romanized specialization can win                | Too strong                 | Compression, latency, and specific cross-language directions can also matter.                        |
+| Start with English and Hindi                         | Sensible provisional scope | Prefer a language you can inspect; add a second script after a useful result.                        |
+| An 80 MB budget alongside an E5-small starting point | Unresolved size mismatch   | E5's published INT8 ONNX alone is about 118 MB; the budget needs measurement and a compression plan. |
+| Reduce MiniLM layers to get a tiny download          | Incomplete                 | Vocabulary can dominate storage even when transformer compute is small.                              |
+| Aksharantar and BPCC supply retrieval training       | Only indirectly            | Transliteration and translation pairs provide alignment, not search relevance.                       |
+| Dakshina is gold retrieval evaluation                | Incorrect                  | It supplies human Romanizations, not query-to-passage relevance judgments.                           |
+| Use MIRACL as independent evaluation                 | Needs qualification        | Its held-out split is useful, but E5 trained on its training split.                                  |
+| Add a reranker after examining top-20 recall         | Sound                      | It only helps when relevant passages enter the candidate set.                                        |
+| A 40 to 80 MB translator can rival IndicTrans2       | An ambitious target        | Requires actual compression/distillation and evaluation, not ordinary fine-tuning.                   |
+| There is no credible third project                   | Unsupported                | Code-mixed tagging and bounded OCR are feasible alternatives.                                        |
 
 ### Browser size changes the training choice
 
@@ -81,7 +91,7 @@ Score top-5, top-10, and top-20 candidates. Report incremental latency and combi
 1. [IBM Granite embedding 97M multilingual R2](https://huggingface.co/ibm-granite/granite-embedding-97m-multilingual-r2). Released in 2026; explicit retrieval training includes Hindi, Bengali, Marathi, Telugu, and Urdu. Its [Transformers.js ONNX export](https://huggingface.co/onnx-community/granite-embedding-97m-multilingual-r2-ONNX/tree/main/onnx) lists a 97.9 MB INT8 graph. Add this alongside E5 before choosing the student.
 2. [Bekko embedding v1 a8m](https://huggingface.co/hotchpotch/bekko-embedding-v1-a8m). The card provides browser instructions and public training resources. The name counts active transformer parameters; the full model is about 106M parameters. It is a relevant throughput comparator, not an 8 MB download. Its aggregate scores are author-reported, not evidence of Hindi or Romanized superiority.
 3. [EmbeddingGemma](https://huggingface.co/google/embeddinggemma-300m). Keep as a larger on-device reference. Its card supports reduced embedding dimensions and lists Gemma terms, rather than an MIT license. Smaller output vectors reduce index storage, not automatically model storage.
-4. [Jina v5 text nano](https://jina.ai/en-US/models/jina-embeddings-v5-text-nano/). Astra's 239M figure and noncommercial weight-license description are supported. It is useful as a reference, but not interchangeable with a permissively licensed release base.
+4. [Jina v5 text nano](https://jina.ai/en-US/models/jina-embeddings-v5-text-nano/). The source lists 239M parameters and a noncommercial weight license. It is useful as a reference, but not interchangeable with a permissively licensed release base.
 
 Prioritize the first two additions and E5 for the pilot. Running every available model would consume time without resolving the core question.
 
@@ -93,7 +103,7 @@ Prioritize the first two additions and E5 for the pilot. Running every available
 
 ### Translation competition
 
-[Sarvam Edge's technical announcement](https://www.sarvam.ai/blogs/sarvam-edge) describes a 150M translation model and about 334 MB on-device memory. This is evidence of serious native-device work, not proof of a publicly downloadable browser checkpoint. Treat vendor latency and quality claims as claims until reproduced.
+The final section records Sarvam Edge results and their implications for later model projects.
 
 [Chrome's Translator API](https://developer.chrome.com/docs/ai/translator-api) already lists Hindi and Bengali and currently says it works on desktop, not mobile. Offline/private operation alone is therefore insufficient differentiation on supported Chrome desktops. Portable browser support, smaller downloads, or demonstrated improvements on a specific language pair are stronger targets.
 
@@ -137,7 +147,7 @@ Measure both normalization errors and downstream retrieval. This becomes worthwh
 
 ### 4. One-script printed OCR
 
-Public recognition labels do exist. [IIIT's Mozhi resources](https://ilocr.iiit.ac.in/dataset/) and [deployable OCR paper](https://ilocr.iiit.ac.in/dataset/static/assets/img/publication/printed/deployable_ocr.pdf) include cropped recognition data. This improves the feasibility assessment relative to Grok's suggestion. [IndicDLP](https://github.com/AI4Bharat/IndicDLP) addresses layout, so it cannot substitute for text transcription labels.
+Public recognition labels do exist. [IIIT's Mozhi resources](https://ilocr.iiit.ac.in/dataset/) and [deployable OCR paper](https://ilocr.iiit.ac.in/dataset/static/assets/img/publication/printed/deployable_ocr.pdf) include cropped recognition data. [IndicDLP](https://github.com/AI4Bharat/IndicDLP) addresses layout, so it cannot substitute for text transcription labels.
 
 Start with one script and cropped printed words or lines, using the labels actually available. Compare a compact CTC recognizer, which predicts character sequences without a text-generation decoder, with relevant OCR baselines. TrOCR-small need not be the default. Evaluate character/word error, artifact size, latency, and unfamiliar fonts. Real page OCR additionally requires detection and reading order. Dataset access and component licenses need inspection before committing to this route.
 
@@ -147,7 +157,15 @@ I rank OCR below retrieval and code-mixed tagging because its deployment and eva
 
 This remains your strongest alternative if you want a visibly useful standalone model. First measure one direction with existing distilled IndicTrans2 and [OPUS-MT's browser export](https://huggingface.co/Xenova/opus-mt-en-hi/tree/main/onnx). Then inspect language-specific vocabulary pruning and export weight deduplication before funding a new student.
 
-If distilling, choose a target-language-capable tokenizer. Plain English T5-small is not a ready Indic translator. A supported encoder-decoder architecture does not guarantee good target-script coverage. Report chrF, a documented BLEU setup, meaning preservation, and end-to-end browser sentence latency. A 40–80 MB package is a research target, not a likely outcome established by these notes.
+If distilling, choose a target-language-capable tokenizer. Plain English T5-small is not a ready Indic translator. A supported encoder-decoder architecture does not guarantee good target-script coverage. Report chrF, a documented BLEU setup, meaning preservation, and end-to-end browser sentence latency. A 40 to 80 MB package is a research target, not a likely outcome established by these notes.
+
+### Other options to retain
+
+- A local toolkit using existing weights is a valid fallback if new training fails to improve quality or cost. A working transliteration/retrieval pipeline still needs end-to-end browser validation.
+- Hinglish-to-English generation is a later normalization/translation branch. PHINC and HinGE were suggested as possible public sources; inspect their availability, task definitions, splits, and terms before adopting them. Neither was validated for a training recipe here.
+- Sentence-similarity models such as multilingual MiniLM or IndicSBERT can be secondary controls, but similarity training alone does not establish retrieval quality. Prioritize retrieval-trained baselines.
+- Larger embedding models such as multilingual E5-large, BGE-M3, and Qwen3 Embedding can be teacher candidates. Add one only after demonstrating target-task gains and affordable local scoring.
+- A general chatbot, full 22-language translation, and private-corpus legal/health projects remain outside the initial scope. Small-model speech work is possible later; it is not ruled out merely because larger organizations already work on it.
 
 ## Bounded first experiment
 
@@ -162,7 +180,7 @@ If distilling, choose a target-language-capable tokenizer. Plain English T5-smal
 
 ### Stage 2: one training change at a time
 
-1. Fine-tune unchanged E5 on a bounded 100k–300k selection of public relevance examples, with retained English/native examples and controlled Romanized variants.
+1. Fine-tune the selected baseline, provisionally E5, on a bounded 100k to 300k selection of public relevance examples, with retained English/native examples and controlled Romanized variants. Keep the architecture unchanged in this experiment.
 2. Compare against the unchanged model. Inspect failures before adding teacher complexity.
 3. Test vocabulary pruning separately, then a recovery fine-tune if necessary.
 4. Add distillation only when the teacher improves the target task. For script robustness, a useful experiment is native-script teacher input paired with Romanized student input; judge whether meaning survives the transformation.
@@ -180,6 +198,61 @@ Example acceptance criteria, to set before final evaluation:
 
 These numbers are proposed decision thresholds. A few Kaggle weeks is not a scientific stopping rule; stop after the bounded ablations show no useful quality, size, or latency advantage.
 
-## Final choice
+## Near-term decision
 
 Build a narrowly scoped retriever whose browser cost and Indic quality are measured together. Start with current baselines, then compare script adaptation and vocabulary compression as separate experiments. Keep translation as the strongest reuse of your existing work. If you prefer a smaller public-label project, code-mixed token tagging is the most credible additional option I found.
+
+
+## Sarvam Edge results and a roadmap for similar models
+
+### Reported results
+
+Sarvam's 14 February 2026 announcement reports the following. These are vendor measurements, not results reproduced in this workspace. [Source](https://www.sarvam.ai/blogs/sarvam-edge).
+
+| Component          | Parameters | Reported footprint            | Reported latency/throughput                           | Test device        |
+| ------------------ | ---------- | ----------------------------- | ----------------------------------------------------- | ------------------ |
+| Speech recognition | 74M        | About 294 MB, labeled FP16    | First token under 300 ms; real-time factor about 0.12 | Snapdragon 8 Gen 3 |
+| Speech synthesis   | 24M        | About 60 MB deployable file   | First audio 260 ms; real-time factor 0.19             | Galaxy S25 Ultra   |
+| Translation        | 150M       | About 334 MB on-device memory | First token about 200 ms; about 30 tokens/s           | Snapdragon 8 Gen 3 |
+
+Speech covers 10 Indian languages; translation covers 11 including English. Reported quality includes competitive ASR on Vistaar, TTS CER 0.0173 using Sarvam ASR, and translation competitive with a 600M comparator. The post does not supply a reproducible training budget or establish browser performance. Its footprint terms differ, so these figures are not equivalent download or peak-memory measurements.
+
+### What this means for us
+
+We can attempt useful models in these parameter ranges. Matching broad production quality is a separate goal. Small final weights do not imply a short training run: training examples, sequence lengths, teacher generation, and repeated experiments determine the compute requirement.
+
+The constraints are not solely data availability:
+
+| Constraint          | What a pilot must establish                                                                          |
+| ------------------- | ---------------------------------------------------------------------------------------------------- |
+| Data suitability    | Public examples cover the chosen language, task, input conditions, and evaluation needs.             |
+| Data preparation    | Selection, cleaning, alignment, and deduplication are affordable without private collection.         |
+| Training throughput | Measured examples or audio-hours processed per GPU-hour support a bounded run.                       |
+| Teacher cost        | A useful teacher can score or generate a manageable training subset locally.                         |
+| Browser execution   | Preprocessing, inference, and any audio generation components work within the chosen runtime budget. |
+| Evaluation          | Improvements survive held-out data and human inspection appropriate to the task.                     |
+
+Public data is available through [IndicVoices](https://huggingface.co/datasets/ai4bharat/IndicVoices) for speech recognition, [IndicVoices-R](https://huggingface.co/datasets/ai4bharat/indicvoices_r) for speech synthesis, and BPCC for translation. [Vistaar](https://github.com/AI4Bharat/vistaar) supplies ASR resources. Inspect exact release components, transcript coverage, speaker metadata, and terms when planning a run.
+
+The announcement does not establish which proprietary datasets or teachers powered these edge models. Attribute no specific advantage to unavailable internal resources without evidence. Existing public checkpoints let us reuse prior training, while a narrower language/task scope reduces the work needed for our first result.
+
+### Deferred roadmap
+
+This is a plan for later investigation. Complete embeddings first. Keep the existing reranking and translation plans available; choose one subsequent project using results and user priorities rather than starting all of them together.
+
+1. **Write a feasibility specification for one component.** Choose ASR, TTS, or the already-planned translator, one initial language or direction, and a measurable use case. Keep browser inference as the deployment target unless the user explicitly changes it. Completion means the data sources, baseline, quality metric, runtime budget, and bounded compute budget are written down.
+2. **Audit public data and select a baseline.** Verify access and terms; inspect a representative sample; separate train/development/test by source and speaker where appropriate. Recheck current checkpoints and their browser export paths. Completion means a versioned manifest and usable held-out evaluation exist, with remaining coverage gaps explicit.
+3. **Profile a small end-to-end run.** Measure native reference inference, actual browser inference, and a short training/adaptation run. Include feature extraction, tokenization, and output generation. Estimate full pilot time from measured throughput, accounting for interrupted Kaggle sessions and teacher costs. Continue only when the bounded pilot fits the available resources.
+4. **Run the smallest useful adaptation or distillation experiment.** Reuse an existing checkpoint first. Compare unchanged weights with one targeted change; add compression separately. Record all runs, failures, outputs, and decisions in the active component's own `experiments/` folder under the shared record rules.
+5. **Evaluate quality and deployment together.** Freeze the candidate before final evaluation. Use the task-specific checks below, an unchanged baseline, and the exact exported artifact. Completion means a reproducible comparison supports either release, another bounded experiment, or stopping.
+6. **Expand only after a useful result.** Add another speaker, language, noise condition, or translation direction one at a time. A combined voice pipeline comes later and requires its own total download, memory, latency, and compounded-error evaluation.
+
+| Component   | First bounded experiment                                                                    | Evaluation needed before expansion                                                                                                                                                                                                               |
+| ----------- | ------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| ASR         | Adapt or distill a compact recognizer for one language using public transcribed speech      | WER/CER with documented normalization; unseen speakers and source separation; clean/noisy and read/spontaneous slices where available; first-token latency, real-time factor, browser memory.                                                    |
+| TTS         | Adapt an existing compact architecture to one public, appropriately licensed voice/language | Intelligibility using an independent recognizer where practical; bilingual listening for pronunciation and naturalness; first-audio latency, real-time factor, and the full bundle including any vocoder. Voice cloning is a separate extension. |
+| Translation | Follow the existing one-direction roadmap using OPUS-MT and IndicTrans2 references          | chrF/BLEU, bilingual meaning checks, general/conversational slices, full sentence latency, and complete model/tokenizer/decoder costs.                                                                                                           |
+
+Real-time factor is processing time divided by audio duration; lower is better. ASR transcription scores alone do not establish TTS naturalness, and cloud/native benchmark numbers are not directly comparable to browser measurements under different conditions.
+
+The longer-term ambition is a set of useful compact Indic models. The next action remains the embedding baseline experiment; Sarvam's results motivate future pilots rather than changing that priority automatically.

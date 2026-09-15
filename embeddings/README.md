@@ -61,8 +61,6 @@ Keep generated datasets, caches, and large checkpoints separate from tracked sou
 ## Background
 
 - [Project context](../context.md)
-- [Validation and options](../VALIDATION_AND_OPTIONS.md)
-- [Astra suggestions](../ASTRA_SUGGESTIONS.md)
-- [Grok suggestions](../GROK_SUGGESTIONS.md)
+- [Suggestions and options](../SUGGESTIONS_AND_OPTIONS.md)
 
-The context defines the constraints. The suggestions and assessment provide evidence and hypotheses; this folder records the embedding project's actual decisions and results.
+The context defines the constraints. The consolidated assessment provides evidence and hypotheses; this folder records the embedding project's actual decisions and results.

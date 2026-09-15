@@ -70,5 +70,5 @@ Add code, configurations, and experiment records here when work starts. Keep lar
 ## Background
 
 - [Project context](../context.md)
-- [Validation and options](../VALIDATION_AND_OPTIONS.md)
+- [Suggestions and options](../SUGGESTIONS_AND_OPTIONS.md)
 - [Embedding roadmap](../embeddings/STEPS.md)
