@@ -6,7 +6,7 @@ The first release should demonstrate either better retrieval at a comparable dow
 
 ## Status
 
-Planning. No base model, training recipe, language set, or deployment budget has been finalized. This folder will hold the embedding project's code, configurations, experiment records, evaluation, and release documentation as they are created.
+E5-small is selected for the next bounded training pilot. The [Romanization v2 experiment](experiments/2026-09-15-romanization-v2/README.md) repaired script conversion and training/validation leakage, regenerated versioned data, and reran E5. Native nDCG@10 is 0.5513; corrected synthetic Romanized nDCG@10 is 0.0. Training preparation and browser validation remain pending.
 
 Start with [STEPS.md](STEPS.md). It describes the initial sequence and the decisions that depend on results. Update it after each experiment rather than treating it as a fixed implementation plan.
 

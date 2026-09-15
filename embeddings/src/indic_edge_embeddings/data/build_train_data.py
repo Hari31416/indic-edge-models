@@ -4,6 +4,8 @@ import argparse
 import json
 import logging
 import random
+import hashlib
+import unicodedata
 from pathlib import Path
 from typing import Any, Dict, List
 
@@ -13,6 +15,7 @@ import pyarrow.parquet as pq
 
 from indic_edge_embeddings.data.transliterate import (
     transliterate_devanagari_to_roman,
+    ROMANIZATION_VERSION,
 )
 
 logging.basicConfig(
@@ -142,6 +145,63 @@ def load_msmarco_xi_records(
     return records
 
 
+def split_and_augment_records(records, max_samples, val_samples, romanized_ratio, seed):
+    """Pack complete source groups into bounded splits; never split variants.
+
+    Limits count rows, so a split may fall short by a group. Equal normalized
+    native queries also stay together. Conflicting source
+    IDs fail rather than silently changing relevance supervision.
+    """
+    if max_samples < 0 or val_samples < 0 or not 0 <= romanized_ratio <= 1:
+        raise ValueError("Invalid split sizes or Romanization ratio")
+    unique = {}
+    for record in records:
+        qid = record["query_id"]
+        if qid in unique and unique[qid] != record:
+            raise ValueError(f"Conflicting records for source query {qid}")
+        unique[qid] = record
+    groups = {}
+    for record in unique.values():
+        normalized = " ".join(
+            unicodedata.normalize("NFC", record["query"]).casefold().split()
+        )
+        groups.setdefault(normalized, []).append(record)
+    ordered = list(groups.items())
+    rng = random.Random(seed)
+    rng.shuffle(ordered)
+    train, validation = [], []
+    for normalized, records_in_group in ordered:
+        group = []
+        group_id = hashlib.sha256(normalized.encode("utf-8")).hexdigest()
+        for record in records_in_group:
+            native = dict(
+                record,
+                source_query_id=record["query_id"],
+                split_group_id=group_id,
+                romanization_version=None,
+            )
+            group.append(native)
+            if rng.random() < romanized_ratio:
+                roman = transliterate_devanagari_to_roman(record["query"])
+                if roman != record["query"]:
+                    group.append(
+                        dict(
+                            native,
+                            query_id=record["query_id"] + "_roman_v2",
+                            query=roman,
+                            script="romanized",
+                            romanization_version=ROMANIZATION_VERSION,
+                        )
+                    )
+        if len(validation) + len(group) <= val_samples:
+            validation.extend(group)
+        elif len(train) + len(group) <= max_samples:
+            train.extend(group)
+    rng.shuffle(train)
+    rng.shuffle(validation)
+    return train, validation
+
+
 def build_hindi_pilot_dataset(
     output_dir: str,
     max_samples: int = 100_000,
@@ -163,6 +223,8 @@ def build_hindi_pilot_dataset(
     """
     random.seed(seed)
     out_path = Path(output_dir)
+    if out_path.exists() and any(out_path.iterdir()):
+        raise FileExistsError(f"Use a new versioned output directory: {out_path}")
     out_path.mkdir(parents=True, exist_ok=True)
 
     records: List[Dict[str, Any]] = []
@@ -178,24 +240,10 @@ def build_hindi_pilot_dataset(
 
     logger.info("Total native base records collected: %d", len(records))
 
-    # 3. Augment with synthetic Romanized queries
-    augmented_records: List[Dict[str, Any]] = []
-    for rec in records:
-        augmented_records.append(rec)
-        if random.random() < romanized_ratio:
-            roman_query = transliterate_devanagari_to_roman(rec["query"])
-            if roman_query and roman_query != rec["query"]:
-                roman_rec = dict(rec)
-                roman_rec["query_id"] = f"{rec['query_id']}_roman"
-                roman_rec["query"] = roman_query
-                roman_rec["script"] = "romanized"
-                augmented_records.append(roman_rec)
-
-    random.shuffle(augmented_records)
-
-    # 4. Split train and validation
-    val_set = augmented_records[:val_samples]
-    train_set = augmented_records[val_samples : max_samples + val_samples]
+    # Keep every native/romanized source group in exactly one split.
+    train_set, val_set = split_and_augment_records(
+        records, max_samples, val_samples, romanized_ratio, seed
+    )
 
     logger.info(
         "Final split counts: %d train, %d validation", len(train_set), len(val_set)
@@ -222,6 +270,8 @@ def build_hindi_pilot_dataset(
         "validation_samples": len(val_set),
         "romanized_ratio": romanized_ratio,
         "seed": seed,
+        "romanization_version": ROMANIZATION_VERSION,
+        "split_policy": "source_and_normalized_query_group",
     }
     with open(out_path / "dataset_metadata.json", "w", encoding="utf-8") as f:
         json.dump(meta, f, indent=2)
@@ -238,7 +288,7 @@ def main() -> None:
     parser.add_argument(
         "--output-dir",
         type=str,
-        default="data/train/pilot_hindi_100k",
+        default="data/train/pilot_hindi_100k_romanized_v2",
         help="Destination directory for training files",
     )
     parser.add_argument(

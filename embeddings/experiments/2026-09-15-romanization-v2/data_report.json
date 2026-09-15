@@ -1,0 +1,503 @@
+{
+  "version": "hindi_ascii_v2",
+  "seed": 42,
+  "sample_seed": 20260915,
+  "input_hashes": {
+    "embeddings/data/eval/miracl_hi_dev_native/queries.jsonl": "87dfdbd0296bf90e1ad414fa3e75362164bdc4b4f2ad4c8f63ce7c3b98adae2c",
+    "embeddings/data/eval/miracl_hi_dev_native/qrels.json": "54d0d4983f2a8237a93b186b396b798418bd215196bb010407800c97eb1fcd64",
+    "embeddings/data/eval/miracl_hi_dev_native/corpus.jsonl": "1e17c88e206638396f97e563d2045921095c3bb1fcc8284f7ba9f43dcbe794d7",
+    "embeddings/data/train/pilot_hindi_100k/train.jsonl": "e591d5aa5a95fdab4336228d252ec5cba091e931d2d41e54fcc51bfec6ca704c",
+    "embeddings/data/train/pilot_hindi_100k/validation.jsonl": "db08ae06c6a19ea8e46890ee47cc0ade11b02ca4e489b4ba09cea110054810af"
+  },
+  "eval": {
+    "path": "embeddings/data/eval/miracl_hi_dev_romanized_v2",
+    "queries": 350,
+    "residual_devanagari": 0,
+    "samples": [
+      {
+        "query_id": "103522#0_roman_v2",
+        "text": "chennaee men kitne digree selsiyas taapamaan hai?",
+        "language": "hi",
+        "script": "romanized",
+        "source_query_id": "103522#0",
+        "metadata": {
+          "original_text": "चेन्नई में कितने डिग्री सेल्सियस तापमान है?",
+          "romanization_version": "hindi_ascii_v2"
+        }
+      },
+      {
+        "query_id": "231582#0_roman_v2",
+        "text": "humaayoonnaamaa' kisne likhaa thaa?",
+        "language": "hi",
+        "script": "romanized",
+        "source_query_id": "231582#0",
+        "metadata": {
+          "original_text": "हुमायूँनामा' किसने लिखा था?",
+          "romanization_version": "hindi_ascii_v2"
+        }
+      },
+      {
+        "query_id": "171267#0_roman_v2",
+        "text": "prakaash sanshleshan kriyaa ke dauraan paudhon men co2 ko kaun grahan kartaa hai?",
+        "language": "hi",
+        "script": "romanized",
+        "source_query_id": "171267#0",
+        "metadata": {
+          "original_text": "प्रकाश संश्लेषण क्रिया के दौरान पौधों में co2 को कौन ग्रहण करता है?",
+          "romanization_version": "hindi_ascii_v2"
+        }
+      },
+      {
+        "query_id": "57186#0_roman_v2",
+        "text": "bovidee ovis kiskaa vaigyaanik naam hai?",
+        "language": "hi",
+        "script": "romanized",
+        "source_query_id": "57186#0",
+        "metadata": {
+          "original_text": "बोविडी ओविस किसका वैज्ञानिक नाम है?",
+          "romanization_version": "hindi_ascii_v2"
+        }
+      },
+      {
+        "query_id": "229301#0_roman_v2",
+        "text": "teesare aangl-maisoor yuddh ko rokne ke lie teepoo sultaan ne angrejon ke saath kaun-see sandhi kee?",
+        "language": "hi",
+        "script": "romanized",
+        "source_query_id": "229301#0",
+        "metadata": {
+          "original_text": "तीसरे आंग्ल-मैसूर युद्ध को रोकने के लिए टीपू सुल्तान ने अंग्रेजों के साथ कौन-सी संधि की?",
+          "romanization_version": "hindi_ascii_v2"
+        }
+      },
+      {
+        "query_id": "23895#0_roman_v2",
+        "text": "kis varsh men seemaa sarak sangathan kee sthaapnaa kee gaee?",
+        "language": "hi",
+        "script": "romanized",
+        "source_query_id": "23895#0",
+        "metadata": {
+          "original_text": "किस वर्ष में सीमा सड़क संगठन की स्थापना की गई?",
+          "romanization_version": "hindi_ascii_v2"
+        }
+      },
+      {
+        "query_id": "1272354#0_roman_v2",
+        "text": "bhaarat kaa ganatantr divas kis taareekh par aataa hai?",
+        "language": "hi",
+        "script": "romanized",
+        "source_query_id": "1272354#0",
+        "metadata": {
+          "original_text": "भारत का गणतंत्र दिवस किस तारीख पर आता है?",
+          "romanization_version": "hindi_ascii_v2"
+        }
+      },
+      {
+        "query_id": "228776#0_roman_v2",
+        "text": "paaneepat kaa teesaraa yuddh kinke beech huaa?",
+        "language": "hi",
+        "script": "romanized",
+        "source_query_id": "228776#0",
+        "metadata": {
+          "original_text": "पानीपत का तीसरा युद्ध किनके बीच हुआ?",
+          "romanization_version": "hindi_ascii_v2"
+        }
+      },
+      {
+        "query_id": "487491#0_roman_v2",
+        "text": "aleegarh muslim vishvavidyaalay ke sansthaapak kaun the?",
+        "language": "hi",
+        "script": "romanized",
+        "source_query_id": "487491#0",
+        "metadata": {
+          "original_text": "अलीगढ़ मुस्लिम विश्वविद्यालय के संस्थापक कौन थे?",
+          "romanization_version": "hindi_ascii_v2"
+        }
+      },
+      {
+        "query_id": "231061#0_roman_v2",
+        "text": "sansadeey samiti pranaalee ke tahat aprail se kitne samiti ne kaary karnaa shuroo kiyaa?",
+        "language": "hi",
+        "script": "romanized",
+        "source_query_id": "231061#0",
+        "metadata": {
+          "original_text": "संसदीय समिति प्रणाली के तहत अप्रैल से कितने समिति ने कार्य करना शुरू किया?",
+          "romanization_version": "hindi_ascii_v2"
+        }
+      },
+      {
+        "query_id": "229676#0_roman_v2",
+        "text": "chipko aandolan' kis vishay se sambandhit hai?",
+        "language": "hi",
+        "script": "romanized",
+        "source_query_id": "229676#0",
+        "metadata": {
+          "original_text": "चिपको आन्दोलन' किस विषय से संबंधित है?",
+          "romanization_version": "hindi_ascii_v2"
+        }
+      },
+      {
+        "query_id": "979199#0_roman_v2",
+        "text": "kainsar ke upachaar men prayukt utkrisht gais kaunasee hai?",
+        "language": "hi",
+        "script": "romanized",
+        "source_query_id": "979199#0",
+        "metadata": {
+          "original_text": "कैंसर के उपचार में प्रयुक्त उत्कृष्ट गैस कौनसी है?",
+          "romanization_version": "hindi_ascii_v2"
+        }
+      },
+      {
+        "query_id": "868530#0_roman_v2",
+        "text": "onalaain baink khaataa kaise khulavaa sakte hai?",
+        "language": "hi",
+        "script": "romanized",
+        "source_query_id": "868530#0",
+        "metadata": {
+          "original_text": "ऑनलाइन बैंक खाता कैसे खुलवा सकते है?",
+          "romanization_version": "hindi_ascii_v2"
+        }
+      },
+      {
+        "query_id": "183449#0_roman_v2",
+        "text": "prashid vyaktitv ‘annaa raajam malhotraa’ kaa nidhan huaa hai, vah kaun thee?",
+        "language": "hi",
+        "script": "romanized",
+        "source_query_id": "183449#0",
+        "metadata": {
+          "original_text": "प्रशिद व्यक्तित्व ‘अन्ना राजम मल्होत्रा’ का निधन हुआ है, वह कौन थी?",
+          "romanization_version": "hindi_ascii_v2"
+        }
+      },
+      {
+        "query_id": "98561#0_roman_v2",
+        "text": "desh men nirmit pahalee paramaanu panadubbee kaa naam kyaa hai?",
+        "language": "hi",
+        "script": "romanized",
+        "source_query_id": "98561#0",
+        "metadata": {
+          "original_text": "देश में निर्मित पहली परमाणु पनडुब्बी का नाम क्या है?",
+          "romanization_version": "hindi_ascii_v2"
+        }
+      },
+      {
+        "query_id": "10907#0_roman_v2",
+        "text": "triptophain ke jaiv sanshleshan ke liye aavashyak tatv konasaa hai?",
+        "language": "hi",
+        "script": "romanized",
+        "source_query_id": "10907#0",
+        "metadata": {
+          "original_text": "ट्रिप्टोफैन के जैव संश्लेषण के लिये आवश्यक तत्व कोनसा है?",
+          "romanization_version": "hindi_ascii_v2"
+        }
+      },
+      {
+        "query_id": "23161#0_roman_v2",
+        "text": "aljeeriyaa ke pradhaanamantree kaun see bhaashaa bolte hai?",
+        "language": "hi",
+        "script": "romanized",
+        "source_query_id": "23161#0",
+        "metadata": {
+          "original_text": "अल्जीरिया के प्रधानमंत्री कौन सी भाषा बोलते है?",
+          "romanization_version": "hindi_ascii_v2"
+        }
+      },
+      {
+        "query_id": "797350#0_roman_v2",
+        "text": "shushk sel me kis tarah kee oorjaa vidhut hotee hai?",
+        "language": "hi",
+        "script": "romanized",
+        "source_query_id": "797350#0",
+        "metadata": {
+          "original_text": "शुष्क सेल मे किस तरह की ऊर्जा विधुत होती है?",
+          "romanization_version": "hindi_ascii_v2"
+        }
+      },
+      {
+        "query_id": "1326085#0_roman_v2",
+        "text": "maanav ne sabase pahale kiskaa prayog aarambh kiyaa thaa?",
+        "language": "hi",
+        "script": "romanized",
+        "source_query_id": "1326085#0",
+        "metadata": {
+          "original_text": "मानव ने सबसे पहले किसका प्रयोग आरंभ किया था?",
+          "romanization_version": "hindi_ascii_v2"
+        }
+      },
+      {
+        "query_id": "984819#0_roman_v2",
+        "text": "raulet ekt ko kis varsh laagoo kiyaa gayaa thaa?",
+        "language": "hi",
+        "script": "romanized",
+        "source_query_id": "984819#0",
+        "metadata": {
+          "original_text": "रौलेट एक्ट को किस वर्ष लागू किया गया था?",
+          "romanization_version": "hindi_ascii_v2"
+        }
+      }
+    ]
+  },
+  "old_source_overlap": 2161,
+  "training": {
+    "path": "embeddings/data/train/pilot_hindi_100k_romanized_v2",
+    "source_native_rows": 80769,
+    "rejected_count": 2,
+    "train_rows": 99994,
+    "validation_rows": 5000,
+    "source_overlap": 0,
+    "normalized_query_group_overlap": 0,
+    "romanized_rows": 24227,
+    "residual_devanagari": 0,
+    "samples": [
+      {
+        "query_id": "msmarco_hi_488020_148798_roman_v2",
+        "query": "naidaanik chikitsaa sonograaphar banne kee aavashyakataaen",
+        "positive": "अमेरिकन रजिस्ट्री फॉर डायग्नोस्टिक मेडिकल सोनोग्राफी (ए.आर.डी.एम.एस.), सोनोग्राफर प्रमाणन प्राप्त कर सकते हैं, जैसे कि पंजीकृत नैदानिक ​​चित्रण सोनोग्राफर (आर.डी.एम.एस.), पंजीकृत नैदानिक ​​हृदय सोनोग्राफर (आर.डी.सी.एस.), पंजीकृत संवहनी प्रौद्योगिकीविद् (आर.वी.टी.) या पंजीकृत मांसपेशियों की रचना (आर.एम.एस.के.)। कुछ राज्यों में सोनोग्राफरों को लाइसेंस प्राप्त करने की आवश्यकता होती है।",
+        "negatives": [],
+        "language": "hi",
+        "script": "romanized",
+        "source": "msmarco-xi",
+        "source_query_id": "msmarco_hi_488020_148798",
+        "split_group_id": "7fde5c0a6c11b592f81e338422c39bea8e74123bc7795a4591700051bb10ea57",
+        "romanization_version": "hindi_ascii_v2"
+      },
+      {
+        "query_id": "msmarco_hi_441757_140644_roman_v2",
+        "query": "tiddee ke per kee shaakhaaen",
+        "positive": "हनी लोकस्ट एक मध्यम आकार का पेड़ है जिसकी शाखाएँ कोणीय होती हैं, एक चौड़ा, सपाट-शीर्ष वाला मुकुट होता है और हल्का, पंखदार पत्ते होते हैं।",
+        "negatives": [],
+        "language": "hi",
+        "script": "romanized",
+        "source": "msmarco-xi",
+        "source_query_id": "msmarco_hi_441757_140644",
+        "split_group_id": "62ad8171f44681144df93e1a29faacc381f392b2ed9a5c26f891d16d8d4bce26",
+        "romanization_version": "hindi_ascii_v2"
+      },
+      {
+        "query_id": "msmarco_hi_403978_123308_roman_v2",
+        "query": "is bee.see.bee.es. neelaa vareeytaa praapt praakritik laabh yojnaa hai",
+        "positive": "हाँ, एक मेडिकेयर एडवांटेज प्राथमिकता प्रदाता योजना जो मेडिकेयर लाभार्थियों के लिए बेहतर स्वास्थ्य लाभ प्रदान करती है।",
+        "negatives": [],
+        "language": "hi",
+        "script": "romanized",
+        "source": "msmarco-xi",
+        "source_query_id": "msmarco_hi_403978_123308",
+        "split_group_id": "4eee4dec32689a442ecbfc7dbba556893f477f39a9285ff6faf4837ec8903a32",
+        "romanization_version": "hindi_ascii_v2"
+      },
+      {
+        "query_id": "swim_-4102738341881422000-hardneg-8_roman_v2",
+        "query": "nainsee see. jems ne kis pustak ko likhaa?",
+        "positive": "Battle of Brandy Station Nancy C. James, former rector of Christ Church, Brandy Station (the diocese rebuilding St. James Episcopal Church nearby and renaming it) and nearby Emmanuel Church, Rapidan, wrote a book describing some of the parish and civic unrest during the 1990-era development controversy, which included reburying at least one previously unidentified Civil War soldier whose original coffin had been made from pews of the destroyed church.",
+        "negatives": [],
+        "language": "hi",
+        "script": "romanized",
+        "source": "indic-swim-ir",
+        "source_query_id": "swim_-4102738341881422000-hardneg-8",
+        "split_group_id": "cd06dc224c59b947b752cfd3aefe21ff3eb598618b78e24a4a98eeef2b3a9a88",
+        "romanization_version": "hindi_ascii_v2"
+      },
+      {
+        "query_id": "msmarco_hi_332776_44771_roman_v2",
+        "query": "kitnee baar paanee denaa hai goodedaaron ko",
+        "positive": "कम से कम एक बार सप्ताह में एक बार",
+        "negatives": [],
+        "language": "hi",
+        "script": "romanized",
+        "source": "msmarco-xi",
+        "source_query_id": "msmarco_hi_332776_44771",
+        "split_group_id": "3e10765632932a5b4d6c7f0492ca16903f645f5a83ec8cbbcdd8cb4a9f0e5a22",
+        "romanization_version": "hindi_ascii_v2"
+      },
+      {
+        "query_id": "msmarco_hi_618372_39975_roman_v2",
+        "query": "kaun saa charan suparanovaa ke baad hotaa hai, yah tay kartaa hai?",
+        "positive": "यह तारे के आकार पर निर्भर करता है।",
+        "negatives": [],
+        "language": "hi",
+        "script": "romanized",
+        "source": "msmarco-xi",
+        "source_query_id": "msmarco_hi_618372_39975",
+        "split_group_id": "66ac5393c7f110ac03813e866e80bf3f2b7832c98af71a4d0a2bfec021ccba30",
+        "romanization_version": "hindi_ascii_v2"
+      },
+      {
+        "query_id": "msmarco_hi_596669_80694_roman_v2",
+        "query": "kavitaa kaa kaun saa vargeekaran jeevan kee stotr hai",
+        "positive": "जीवन की भजन एक उपदेशात्मक कविता है। कवि का कार्य कविता में निर्देश देना और मार्गदर्शन करना, प्रेरित करना और संशोधित करना है। कविता मूल मानव मूल्यों को सिखाती है और एक समृद्ध, नैतिक जीवन की नींव रखती है।",
+        "negatives": [],
+        "language": "hi",
+        "script": "romanized",
+        "source": "msmarco-xi",
+        "source_query_id": "msmarco_hi_596669_80694",
+        "split_group_id": "a34f2c79e83e19d74645b078548260f660a5b45af9e35ac43f150f2333bbdf67",
+        "romanization_version": "hindi_ascii_v2"
+      },
+      {
+        "query_id": "msmarco_hi_561361_102131_roman_v2",
+        "query": "maduro kyaa hain",
+        "positive": "जब मीठे प्लांटेन को सिर्फ एक बार तला जाता है।",
+        "negatives": [],
+        "language": "hi",
+        "script": "romanized",
+        "source": "msmarco-xi",
+        "source_query_id": "msmarco_hi_561361_102131",
+        "split_group_id": "595ac51c39063bf3c898f81d885add1ac21011b1fe015fe8d6c047242c68d5cc",
+        "romanization_version": "hindi_ascii_v2"
+      },
+      {
+        "query_id": "msmarco_hi_374268_155851_roman_v2",
+        "query": "maaikrosopht vaayarales maaus men baitaree kaise lagaaen",
+        "positive": "बैटरी डिब्बे का दरवाजा खोलें और हटा दें। बैटरी डिब्बे में दो ताज़ी बैटरी डालें। सुनिश्चित करें कि आप बैटरी डिब्बे में सकारात्मक संपर्कों की ओर बैटरी के सकारात्मक (+) छोर को इंगित कर रहे हैं।",
+        "negatives": [],
+        "language": "hi",
+        "script": "romanized",
+        "source": "msmarco-xi",
+        "source_query_id": "msmarco_hi_374268_155851",
+        "split_group_id": "39abaf47404b6f71ded1f80abcadf76cf1b117d374e8cdb6c28263a42b76d0a6",
+        "romanization_version": "hindi_ascii_v2"
+      },
+      {
+        "query_id": "msmarco_hi_142288_1853_roman_v2",
+        "query": "vyaakhyaa",
+        "positive": "यह एक ऐसा सिद्धांत है जो कानूनों, समान कानून या कानूनी सिद्धांतों को लागू करने और समय की कमी की लंबी आदत के कारण अमान्य होने का कारण बनता है।",
+        "negatives": [],
+        "language": "hi",
+        "script": "romanized",
+        "source": "msmarco-xi",
+        "source_query_id": "msmarco_hi_142288_1853",
+        "split_group_id": "aa69cadac807b5436303e18c7b77081372d44f3e1bde4d72aa6df3258f29dc9e",
+        "romanization_version": "hindi_ascii_v2"
+      },
+      {
+        "query_id": "msmarco_hi_626842_89084_roman_v2",
+        "query": "aapko teksas laaisens praapt karne ke lie kyaa aavashyak hai",
+        "positive": "यदि पहले से स्थापित नहीं है, तो 1 नागरिकता का प्रमाण आवश्यक होगा। \n2 अमेरिकी पासपोर्ट की पुस्तिका या कार्ड जो समाप्त नहीं हुआ है। \n3 अमेरिकी नागरिकता प्रमाण पत्र या प्राकृतिककरण प्रमाण पत्र।",
+        "negatives": [],
+        "language": "hi",
+        "script": "romanized",
+        "source": "msmarco-xi",
+        "source_query_id": "msmarco_hi_626842_89084",
+        "split_group_id": "de1fc9522fe2c7674e0c7e29193fc93dde6b2fe31314794049121cf8de180703",
+        "romanization_version": "hindi_ascii_v2"
+      },
+      {
+        "query_id": "msmarco_hi_317877_72466_roman_v2",
+        "query": "photo editar kee keemat kitnee hai",
+        "positive": "75 डॉलर से 150 डॉलर प्रति घंटा तक।",
+        "negatives": [],
+        "language": "hi",
+        "script": "romanized",
+        "source": "msmarco-xi",
+        "source_query_id": "msmarco_hi_317877_72466",
+        "split_group_id": "c294a55c595edba4d05f2efc6b1db7c507f768ecb6e321e765e8df41924ee430",
+        "romanization_version": "hindi_ascii_v2"
+      },
+      {
+        "query_id": "msmarco_hi_702495_53089_roman_v2",
+        "query": "sindikalist kyaa hai?",
+        "positive": "यह एक मजदूरी प्रणाली है, जिसे मजदूरी दासता के रूप में माना जाता है। इसलिए अराजकतावादी सिद्धांत आम तौर पर श्रम आंदोलन पर ध्यान केंद्रित करता है।",
+        "negatives": [],
+        "language": "hi",
+        "script": "romanized",
+        "source": "msmarco-xi",
+        "source_query_id": "msmarco_hi_702495_53089",
+        "split_group_id": "befedbaaccaa39e307c4420fe1d1459310cbd879cba4ed19487e3037cced6fd2",
+        "romanization_version": "hindi_ascii_v2"
+      },
+      {
+        "query_id": "msmarco_hi_392852_34026_roman_v2",
+        "query": "prabhaav of kaaron kaa prabhaav",
+        "positive": "अर्थव्यवस्था पर कारों के सबसे दिखाई देने वाले प्रभावों में से एक ऑटोमेकरों और कार विक्रेताओं में रोजगार का सृजन है।",
+        "negatives": [],
+        "language": "hi",
+        "script": "romanized",
+        "source": "msmarco-xi",
+        "source_query_id": "msmarco_hi_392852_34026",
+        "split_group_id": "c6cc82b963de3618e0989cb7021aa0945d6c0cb00f11c6ee82bbb4a8145b3acd",
+        "romanization_version": "hindi_ascii_v2"
+      },
+      {
+        "query_id": "msmarco_hi_443585_25287_roman_v2",
+        "query": "lambartan sudhaar sansthaan",
+        "positive": "यह उत्तरी कैरोलिना के लंबर्टन शहर में स्थित है, जिसकी आबादी 21,823 निवासियों की है। इस जेल में 788 कैदियों की क्षमता है, जिसका अर्थ है कि यह प्रति सुविधा अधिकतम बिस्तरों की मात्रा है।",
+        "negatives": [],
+        "language": "hi",
+        "script": "romanized",
+        "source": "msmarco-xi",
+        "source_query_id": "msmarco_hi_443585_25287",
+        "split_group_id": "24bdaf983ebb74811a95b2102c1f38bca39a9f73a08dd58961588780ded655bc",
+        "romanization_version": "hindi_ascii_v2"
+      },
+      {
+        "query_id": "msmarco_hi_622838_98639_roman_v2",
+        "query": "kho jaane ke sapanon kaa kyaa arth hai",
+        "positive": "ऐसा सपना देखें कि कहीं मैं रास्ता नहीं ढूँढ पा रहा हूँ या कुछ ऐसा नहीं ढूँढ पा रहा हूँ जो पहले से ही वहाँ है।",
+        "negatives": [],
+        "language": "hi",
+        "script": "romanized",
+        "source": "msmarco-xi",
+        "source_query_id": "msmarco_hi_622838_98639",
+        "split_group_id": "4d973eb0c26c8bc80a9a870b533b01536ab899bec0940f7c5284223866571e73",
+        "romanization_version": "hindi_ascii_v2"
+      },
+      {
+        "query_id": "msmarco_hi_1158589_64352_roman_v2",
+        "query": "vilsan kaa vakr kyaa hai",
+        "positive": "विल्सन के वक्र की विशेषता है निचले पश्च दांतों के मुख के कस्प ऊपरी भाग के कस्प से अधिक ऊंचे होते हैं और ऊपरी भाग के लिए इसके विपरीत होता है।",
+        "negatives": [],
+        "language": "hi",
+        "script": "romanized",
+        "source": "msmarco-xi",
+        "source_query_id": "msmarco_hi_1158589_64352",
+        "split_group_id": "f4841a602e74f4f9331503fa61251b6196ab1ae52ad7f776f446c3a2744093c8",
+        "romanization_version": "hindi_ascii_v2"
+      },
+      {
+        "query_id": "msmarco_hi_434097_3578_roman_v2",
+        "query": "ken kaa khaady baajaar sent ogasteen",
+        "positive": "सेंट ऑगस्टीन, एफ.एल. में स्थित बैंकिंग सेवा उद्योग में एक छोटा सा संगठन है। इसने 2009 में अपना दरवाजा खोला।",
+        "negatives": [],
+        "language": "hi",
+        "script": "romanized",
+        "source": "msmarco-xi",
+        "source_query_id": "msmarco_hi_434097_3578",
+        "split_group_id": "3267a95c2c4924a12930d9602b6902cc239c9a89894847e6734cfac6a8124196",
+        "romanization_version": "hindi_ascii_v2"
+      },
+      {
+        "query_id": "msmarco_hi_1160635_43860_roman_v2",
+        "query": "sepaa kaa kyaa arth hai",
+        "positive": "एकल यूरो भुगतान क्षेत्र या एस.ई.पी.ए. यूरो में नामित बैंक हस्तांतरण को सरल बनाने के लिए यूरोपीय संघ की भुगतान-एकीकरण पहल है।",
+        "negatives": [],
+        "language": "hi",
+        "script": "romanized",
+        "source": "msmarco-xi",
+        "source_query_id": "msmarco_hi_1160635_43860",
+        "split_group_id": "dd4199a9b0c235338a534ec4b82410922bdfdacea18c7ef788656c49ab59b935",
+        "romanization_version": "hindi_ascii_v2"
+      },
+      {
+        "query_id": "msmarco_hi_1184664_10136_roman_v2",
+        "query": "sattebaajee aur hejing kee sthiti ke beech antar",
+        "positive": "हेजिंग में मुख्य रूप से किसी भी लाभ और हानि को नियंत्रित करने के लिए एक डेरिवेटिव में ऑफसेटिंग पोजिशन लेना शामिल है जो अंतर्निहित परिसंपत्ति से होता है। हेजिंग निवेशक के पास वर्तमान में जो है उससे विचलन करने वाली ऑफसेटिंग पोजिशन लेकर किसी परिसंपत्ति की कीमत से जुड़ी अस्थिरता से छुटकारा पाने का प्रयास करता है। जहां सट्टेबाजी उस दिशा से लाभ कमाने के लिए होती है जिसमें एक परिसंपत्ति चल रही होगी।",
+        "negatives": [],
+        "language": "hi",
+        "script": "romanized",
+        "source": "msmarco-xi",
+        "source_query_id": "msmarco_hi_1184664_10136",
+        "split_group_id": "87e04a9bee0cad3bb6b036285f89b3c56b723f5d8e7cc0660fdab0987f7423c3",
+        "romanization_version": "hindi_ascii_v2"
+      }
+    ]
+  },
+  "output_hashes": {
+    "embeddings/data/eval/miracl_hi_dev_romanized_v2/metadata.json": "ef5fe76eb3582ecdc4d57fa03b2a8ebe3cc7657eb12842b5835bc4ae45cbd209",
+    "embeddings/data/eval/miracl_hi_dev_romanized_v2/corpus.jsonl": "1e17c88e206638396f97e563d2045921095c3bb1fcc8284f7ba9f43dcbe794d7",
+    "embeddings/data/eval/miracl_hi_dev_romanized_v2/queries.jsonl": "9e934565bf6a49d35c317719f75c09c408cd569a2d5c143ffec34b6f7d96dda9",
+    "embeddings/data/eval/miracl_hi_dev_romanized_v2/qrels.json": "ba4f564c6e0e89337dc2e3adb350b8c6af03f818f2f77525f75614e66930b24b",
+    "embeddings/data/train/pilot_hindi_100k_romanized_v2/train.jsonl": "03c040f531d53ea0a6c3b4f2496bf9f93b6c2c14e3816ecd7f29e7ab5a8a1888",
+    "embeddings/data/train/pilot_hindi_100k_romanized_v2/train.parquet": "84ab912acc8a924612650da2e42a30be4b0356244e9504c04ac9a2ff959deed3",
+    "embeddings/data/train/pilot_hindi_100k_romanized_v2/validation.jsonl": "5d2e88a629ecb78604dba777fb0ca5ea1efd5e3906f54332e0b7566b35053368",
+    "embeddings/data/train/pilot_hindi_100k_romanized_v2/validation.parquet": "20e4a2066cbfc40d312a8ce36dc1848c28c4b0aa6ccd7c1b716a432cbef8d4ec"
+  }
+}

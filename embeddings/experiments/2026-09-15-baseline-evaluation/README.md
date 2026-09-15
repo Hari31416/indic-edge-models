@@ -84,3 +84,7 @@ Raw results stored in:
 ## Next step
 
 Proceed to Step 4 of the roadmap: Train the pilot adaptation model on `pilot_hindi_100k` using Kaggle 2x T4 GPUs via `scripts/run_kaggle.py`.
+
+## Subsequent audit, 15 September 2026
+
+The [Romanized baseline audit](../2026-09-15-romanized-audit/README.md) reproduced E5's score and verified query/relevance mappings and the corpus. It found 18/350 queries with residual Devanagari and synthetic spelling limitations. The original interpretation of universal Romanization failure and immediate training readiness is therefore superseded: these scores describe the existing synthetic slice, and a corrected, inspected slice is needed before the full pilot. The original results and decision above are retained as experiment history.

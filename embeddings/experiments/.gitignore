@@ -1,0 +1,3 @@
+# Reproducible verbose outputs; retain compact reports and experiment records.
+**/*_rankings.json
+**/*.log

@@ -1,0 +1,18 @@
+{
+  "training": {
+    "path": "embeddings/data/train/pilot_hindi_100k_romanized_v2",
+    "source_native_rows": 80769,
+    "rejected_count": 2,
+    "train_rows": 100000,
+    "validation_rows": 5000,
+    "source_overlap": 0,
+    "romanized_rows": 24275,
+    "residual_devanagari": 0
+  },
+  "output_hashes": {
+    "embeddings/data/eval/miracl_hi_dev_romanized_v2/metadata.json": "ef5fe76eb3582ecdc4d57fa03b2a8ebe3cc7657eb12842b5835bc4ae45cbd209",
+    "embeddings/data/eval/miracl_hi_dev_romanized_v2/corpus.jsonl": "1e17c88e206638396f97e563d2045921095c3bb1fcc8284f7ba9f43dcbe794d7",
+    "embeddings/data/eval/miracl_hi_dev_romanized_v2/queries.jsonl": "9e934565bf6a49d35c317719f75c09c408cd569a2d5c143ffec34b6f7d96dda9",
+    "embeddings/data/eval/miracl_hi_dev_romanized_v2/qrels.json": "ba4f564c6e0e89337dc2e3adb350b8c6af03f818f2f77525f75614e66930b24b"
+  }
+}

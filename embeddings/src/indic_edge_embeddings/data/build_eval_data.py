@@ -14,6 +14,7 @@ import pyarrow.parquet as pq
 
 from indic_edge_embeddings.data.transliterate import (
     transliterate_devanagari_to_roman,
+    ROMANIZATION_VERSION,
 )
 from indic_edge_embeddings.eval.loader import (
     CorpusDoc,
@@ -146,6 +147,8 @@ def build_miracl_hindi_eval(
     """
     base_path = Path(output_base_dir)
     base_path.mkdir(parents=True, exist_ok=True)
+    if (base_path / f"miracl_hi_{split}_romanized_v2").exists():
+        raise FileExistsError("Romanized v2 already exists; use a new output directory")
 
     logger.info("Fetching MIRACL Hindi %s topics and qrels from Hugging Face...", split)
     topics_path = hf_hub_download(
@@ -204,8 +207,11 @@ def build_miracl_hindi_eval(
     roman_manifest = create_romanized_query_slice(
         native_manifest,
         transliterate_fn=transliterate_devanagari_to_roman,
+        suffix="_roman_v2",
     )
-    roman_dir = base_path / f"miracl_hi_{split}_romanized"
+    roman_manifest.name = f"miracl_hi_{split}_romanized_v2"
+    roman_manifest.metadata["romanization_version"] = ROMANIZATION_VERSION
+    roman_dir = base_path / f"miracl_hi_{split}_romanized_v2"
     roman_manifest.save(roman_dir)
     export_manifest_to_parquet(roman_manifest, roman_dir)
 

@@ -1,0 +1,18 @@
+{
+  "status": "passed",
+  "checked_training_rows": 104994,
+  "checked_eval_queries": 350,
+  "checks": [
+    "original inputs preserved",
+    "output hashes match",
+    "source and normalized query split disjointness",
+    "unique query IDs",
+    "training passage/negative labels unchanged",
+    "Romanization matches current implementation",
+    "no residual Devanagari",
+    "English tokens preserved",
+    "evaluation relevance IDs unchanged",
+    "evaluation corpus unchanged",
+    "final evaluation data identical to scored initial v2"
+  ]
+}

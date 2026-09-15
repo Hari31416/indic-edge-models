@@ -1,0 +1,178 @@
+{
+  "git_revision": "7fc85c7332bf63cf271b449ef14bdc85576c1db6",
+  "seed": 20260915,
+  "runtime": {
+    "torch": "2.14.0",
+    "transformers": "5.17.0",
+    "numpy": "2.5.3",
+    "indic-transliteration": "2.3.82"
+  },
+  "hashes": {
+    "embeddings/data/eval/miracl_hi_dev_native/queries.jsonl": "87dfdbd0296bf90e1ad414fa3e75362164bdc4b4f2ad4c8f63ce7c3b98adae2c",
+    "embeddings/data/eval/miracl_hi_dev_native/qrels.json": "54d0d4983f2a8237a93b186b396b798418bd215196bb010407800c97eb1fcd64",
+    "embeddings/data/eval/miracl_hi_dev_native/corpus.jsonl": "1e17c88e206638396f97e563d2045921095c3bb1fcc8284f7ba9f43dcbe794d7",
+    "embeddings/data/eval/miracl_hi_dev_romanized/queries.jsonl": "5367d9836c0c93cf12360a4db709eb3386853eb3cf6f52ee650177d1c91f3f71",
+    "embeddings/data/eval/miracl_hi_dev_romanized/qrels.json": "f62db1859235fcd1b77b686bedde84a1e550e019a5d850d7a9257154ff9fccb2",
+    "embeddings/data/eval/miracl_hi_dev_romanized/corpus.jsonl": "1e17c88e206638396f97e563d2045921095c3bb1fcc8284f7ba9f43dcbe794d7"
+  },
+  "data": {
+    "native_count": 350,
+    "romanized_count": 350,
+    "unique_roman_ids": 350,
+    "mapping_errors": 0,
+    "qrels_without_query": 0,
+    "empty_roman_queries": 0,
+    "residual_devanagari_queries": 18,
+    "current_transliteration_mismatches": 0,
+    "missing_relevant_docs": 0
+  },
+  "samples": [
+    {
+      "native": "चेन्नई में कितने डिग्री सेल्सियस तापमान है?",
+      "romanized": "chennai mem kitane digri selsiyasa tapamana hai?",
+      "id": "103522#0_roman"
+    },
+    {
+      "native": "हुमायूँनामा' किसने लिखा था?",
+      "romanized": "humayu.nnama' kisane likha tha?",
+      "id": "231582#0_roman"
+    },
+    {
+      "native": "प्रकाश संश्लेषण क्रिया के दौरान पौधों में co2 को कौन ग्रहण करता है?",
+      "romanized": "prakasha samshleshana kriya ke daurana paudhom mem co2 ko kauna grahana karata hai?",
+      "id": "171267#0_roman"
+    },
+    {
+      "native": "बोविडी ओविस किसका वैज्ञानिक नाम है?",
+      "romanized": "bovidi ovisa kisaka vaij~nanika nama hai?",
+      "id": "57186#0_roman"
+    },
+    {
+      "native": "तीसरे आंग्ल-मैसूर युद्ध को रोकने के लिए टीपू सुल्तान ने अंग्रेजों के साथ कौन-सी संधि की?",
+      "romanized": "tisare amgla-maisura yuddha ko rokane ke lie tipu sultana ne amgrejom ke satha kauna-si samdhi ki?",
+      "id": "229301#0_roman"
+    },
+    {
+      "native": "किस वर्ष में सीमा सड़क संगठन की स्थापना की गई?",
+      "romanized": "kisa varsha mem sima sa.daka samgathana ki sthapana ki gai?",
+      "id": "23895#0_roman"
+    },
+    {
+      "native": "भारत का गणतंत्र दिवस किस तारीख पर आता है?",
+      "romanized": "bharata ka ganatamtra divasa kisa tarikha para ata hai?",
+      "id": "1272354#0_roman"
+    },
+    {
+      "native": "पानीपत का तीसरा युद्ध किनके बीच हुआ?",
+      "romanized": "panipata ka tisara yuddha kinake bicha hua?",
+      "id": "228776#0_roman"
+    },
+    {
+      "native": "अलीगढ़ मुस्लिम विश्वविद्यालय के संस्थापक कौन थे?",
+      "romanized": "aligaढ़ muslima vishvavidyalaya ke samsthapaka kauna the?",
+      "id": "487491#0_roman"
+    },
+    {
+      "native": "संसदीय समिति प्रणाली के तहत अप्रैल से कितने समिति ने कार्य करना शुरू किया?",
+      "romanized": "samsadiya samiti pranali ke tahata apraila se kitane samiti ne karya karana shuru kiya?",
+      "id": "231061#0_roman"
+    },
+    {
+      "native": "चिपको आन्दोलन' किस विषय से संबंधित है?",
+      "romanized": "chipako andolana' kisa vishaya se sambamdhita hai?",
+      "id": "229676#0_roman"
+    },
+    {
+      "native": "कैंसर के उपचार में प्रयुक्त उत्कृष्ट गैस कौनसी है?",
+      "romanized": "kaimsara ke upachara mem prayukta utkrrishta gaisa kaunasi hai?",
+      "id": "979199#0_roman"
+    },
+    {
+      "native": "ऑनलाइन बैंक खाता कैसे खुलवा सकते है?",
+      "romanized": "ऑnalaina baimka khata kaise khulava sakate hai?",
+      "id": "868530#0_roman"
+    },
+    {
+      "native": "प्रशिद व्यक्तित्व ‘अन्ना राजम मल्होत्रा’ का निधन हुआ है, वह कौन थी?",
+      "romanized": "prashida vyaktitva ‘anna rajama malhotra’ ka nidhana hua hai, vaha kauna thi?",
+      "id": "183449#0_roman"
+    },
+    {
+      "native": "देश में निर्मित पहली परमाणु पनडुब्बी का नाम क्या है?",
+      "romanized": "desha mem nirmita pahali paramanu panadubbi ka nama kya hai?",
+      "id": "98561#0_roman"
+    },
+    {
+      "native": "ट्रिप्टोफैन के जैव संश्लेषण के लिये आवश्यक तत्व कोनसा है?",
+      "romanized": "triptophaina ke jaiva samshleshana ke liye avashyaka tatva konasa hai?",
+      "id": "10907#0_roman"
+    },
+    {
+      "native": "अल्जीरिया के प्रधानमंत्री कौन सी भाषा बोलते है?",
+      "romanized": "aljiriya ke pradhanamamtri kauna si bhasha bolate hai?",
+      "id": "23161#0_roman"
+    },
+    {
+      "native": "शुष्क सेल मे किस तरह की ऊर्जा विधुत होती है?",
+      "romanized": "shushka sela me kisa taraha ki urja vidhuta hoti hai?",
+      "id": "797350#0_roman"
+    },
+    {
+      "native": "मानव ने सबसे पहले किसका प्रयोग आरंभ किया था?",
+      "romanized": "manava ne sabase pahale kisaka prayoga arambha kiya tha?",
+      "id": "1326085#0_roman"
+    },
+    {
+      "native": "रौलेट एक्ट को किस वर्ष लागू किया गया था?",
+      "romanized": "rauleta ekta ko kisa varsha lagu kiya gaya tha?",
+      "id": "984819#0_roman"
+    }
+  ],
+  "cache": {
+    "path": "embeddings/data/cache/corpus_emb_8e0da0ebae.npy",
+    "shape": [
+      506264,
+      384
+    ],
+    "sha256": "5f8c635c7c4ee294dde614813bf86917e1fba058595359d3d8512de54a4f1d96",
+    "fresh_row_cosine": {
+      "min": 0.9999999403953552,
+      "mean": 1.0
+    }
+  },
+  "model_snapshots": [
+    "614241f622f53c4eeff9890bdc4f31cfecc418b3"
+  ],
+  "evaluations": {
+    "native": {
+      "ndcg@1": 0.44857142857142857,
+      "recall@1": 0.26648072562358277,
+      "mrr@1": 0.44857142857142857,
+      "ndcg@5": 0.504465310975366,
+      "recall@5": 0.5673968253968255,
+      "mrr@5": 0.5620952380952381,
+      "ndcg@10": 0.551330776213189,
+      "recall@10": 0.6899002267573697,
+      "mrr@10": 0.5721530612244897,
+      "ndcg@20": 0.5788716306127885,
+      "recall@20": 0.7766462585034014,
+      "mrr@20": 0.5749391427286165,
+      "eval_query_count": 350.0
+    },
+    "romanized": {
+      "ndcg@1": 0.0,
+      "recall@1": 0.0,
+      "mrr@1": 0.0,
+      "ndcg@5": 0.0,
+      "recall@5": 0.0,
+      "mrr@5": 0.0,
+      "ndcg@10": 0.0005526468674779166,
+      "recall@10": 0.0014285714285714286,
+      "mrr@10": 0.00035714285714285714,
+      "ndcg@20": 0.0012839555097916753,
+      "recall@20": 0.004285714285714286,
+      "mrr@20": 0.0005612244897959184,
+      "eval_query_count": 350.0
+    }
+  }
+}

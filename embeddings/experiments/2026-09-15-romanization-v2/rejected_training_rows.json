@@ -1,0 +1,12 @@
+[
+  {
+    "query_id": "msmarco_hi_428656_17786",
+    "query": "क्या there is a वीडियो प्लेयर on/of़्रामक",
+    "reason": "Unsupported Hindi Romanization: '़्रामक' -> '़raamak'"
+  },
+  {
+    "query_id": "msmarco_hi_515757_104441",
+    "query": "बाज़ राॻ गए हैं पहले से ही",
+    "reason": "Unsupported Hindi Romanization: 'राॻ' -> 'raaॻ'"
+  }
+]
