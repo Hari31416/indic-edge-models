@@ -1,9 +1,12 @@
 """Kaggle API client wrapper for kernel management, polling, and output retrieval."""
 
+import fnmatch
 import json
 import logging
 from pathlib import Path
+import shutil
 import sys
+import tempfile
 import time
 from typing import Any, Dict, List, Optional, Tuple
 
@@ -187,26 +190,97 @@ def stream_kernel_logs(kernel_id: str) -> None:
         logger.debug("Live log streaming ended: %s", e)
 
 
-def pull_kernel_output(kernel_id: str, destination_dir: Path) -> List[Path]:
-    """Download output artifacts from a completed Kaggle kernel.
+DEFAULT_OUTPUT_EXCLUDES = [
+    "cache/**",
+    "cache",
+    "pkg_src/**",
+    "pkg_src",
+    "pkg_payload.zip",
+    "data_payload.zip",
+    "__results__.html",
+    "*.pyc",
+]
+
+
+def _match_pattern(rel_path_str: str, patterns: List[str]) -> bool:
+    """Check if relative path matches any glob pattern."""
+    for pat in patterns:
+        if fnmatch.fnmatch(rel_path_str, pat) or fnmatch.fnmatch(
+            Path(rel_path_str).name, pat
+        ):
+            return True
+        if pat.endswith("/**") and rel_path_str.startswith(pat[:-3]):
+            return True
+    return False
+
+
+def pull_kernel_output(
+    kernel_id: str,
+    destination_dir: Path,
+    include_patterns: Optional[List[str]] = None,
+    exclude_patterns: Optional[List[str]] = None,
+) -> List[Path]:
+    """Download output artifacts from a completed Kaggle kernel with selective filtering.
 
     Args:
-        kernel_id: Identifier of the kernel.
-        destination_dir: Directory to save downloaded files.
+        kernel_id: Identifier of the kernel (e.g. 'username/slug').
+        destination_dir: Directory to save filtered downloaded files.
+        include_patterns: Optional glob patterns to include (e.g. ['outputs/**', '*.log']).
+        exclude_patterns: Optional glob patterns to exclude (e.g. ['cache/**', 'pkg_src/**']).
 
     Returns:
-        List of downloaded file paths.
+        List of saved file paths in destination_dir.
     """
     destination_dir.mkdir(parents=True, exist_ok=True)
     logger.info("Downloading outputs for '%s' to %s...", kernel_id, destination_dir)
 
+    effective_excludes = list(exclude_patterns or DEFAULT_OUTPUT_EXCLUDES)
     api = get_kaggle_api()
-    api.kernels_output(kernel_id, path=str(destination_dir), force=True, quiet=False)
 
-    downloaded = list(destination_dir.rglob("*"))
-    files_only = [f for f in downloaded if f.is_file()]
-    logger.info("Downloaded %d output files from kernel.", len(files_only))
-    return files_only
+    # If user specified a single include prefix (e.g. 'outputs/**' or 'outputs/*'), pass server-side pattern
+    server_pattern = None
+    if include_patterns and len(include_patterns) == 1:
+        pat = include_patterns[0]
+        if pat.endswith("/**"):
+            server_pattern = pat[:-3] + "/*"
+        elif not pat.startswith("*"):
+            server_pattern = pat
+
+    saved_files: List[Path] = []
+
+    with tempfile.TemporaryDirectory() as tmp_dir:
+        tmp_path = Path(tmp_dir)
+        api.kernels_output(
+            kernel_id,
+            path=str(tmp_path),
+            file_pattern=server_pattern,
+            force=True,
+            quiet=False,
+        )
+
+        for file_path in tmp_path.rglob("*"):
+            if not file_path.is_file():
+                continue
+
+            rel_str = str(file_path.relative_to(tmp_path))
+
+            # Check explicit exclusions
+            if _match_pattern(rel_str, effective_excludes):
+                logger.debug("Excluding file from output download: %s", rel_str)
+                continue
+
+            # Check explicit inclusions if specified
+            if include_patterns and not _match_pattern(rel_str, include_patterns):
+                logger.debug("Skipping non-included output file: %s", rel_str)
+                continue
+
+            dest_file = destination_dir / rel_str
+            dest_file.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(file_path, dest_file)
+            saved_files.append(dest_file)
+
+    logger.info("Saved %d output files to %s.", len(saved_files), destination_dir)
+    return saved_files
 
 
 def append_experiment_record(

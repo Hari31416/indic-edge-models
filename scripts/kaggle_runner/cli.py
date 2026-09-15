@@ -112,6 +112,8 @@ def handle_run(args: argparse.Namespace) -> int:
         extra_pip_deps=args.extra_deps or [],
         output_dir=Path(args.output_dir) if args.output_dir else None,
         record_file=Path(args.record_file) if args.record_file else None,
+        include_outputs=args.include_outputs or [],
+        exclude_outputs=args.exclude_outputs or [],
     )
 
     repo_root = find_repo_root()
@@ -146,7 +148,12 @@ def handle_run(args: argparse.Namespace) -> int:
 
     if destination_dir:
         try:
-            pull_kernel_output(actual_kernel_id, destination_dir)
+            pull_kernel_output(
+                actual_kernel_id,
+                destination_dir,
+                include_patterns=config.include_outputs,
+                exclude_patterns=config.exclude_outputs,
+            )
         except Exception as e:
             logger.error("Failed to pull outputs: %s", e)
 
@@ -219,7 +226,12 @@ def handle_pull(args: argparse.Namespace) -> int:
         kernel_id = f"{user}/{kernel_id}"
 
     output_dir = Path(args.output_dir)
-    pull_kernel_output(kernel_id, destination_dir=output_dir)
+    pull_kernel_output(
+        kernel_id,
+        destination_dir=output_dir,
+        include_patterns=args.include_outputs or [],
+        exclude_patterns=args.exclude_outputs or [],
+    )
     return 0
 
 
@@ -349,6 +361,18 @@ def create_parser() -> argparse.ArgumentParser:
         help="Disable internet access in Kaggle kernel",
     )
     run_p.add_argument(
+        "--include-outputs",
+        nargs="*",
+        default=[],
+        help="Glob patterns of output files to download (e.g. 'outputs/**', '*.json')",
+    )
+    run_p.add_argument(
+        "--exclude-outputs",
+        nargs="*",
+        default=[],
+        help="Glob patterns of output files to skip downloading (e.g. 'cache/**', 'pkg_src/**')",
+    )
+    run_p.add_argument(
         "--dry-run",
         action="store_true",
         help="Stage all files locally without submitting to Kaggle",
@@ -400,6 +424,18 @@ def create_parser() -> argparse.ArgumentParser:
     pull_p.add_argument("--kernel", type=str, required=True, help="Kernel ID or slug")
     pull_p.add_argument(
         "--output-dir", type=str, required=True, help="Local directory to save files"
+    )
+    pull_p.add_argument(
+        "--include-outputs",
+        nargs="*",
+        default=[],
+        help="Glob patterns of output files to download (e.g. 'outputs/**', '*.json')",
+    )
+    pull_p.add_argument(
+        "--exclude-outputs",
+        nargs="*",
+        default=[],
+        help="Glob patterns of output files to skip downloading (e.g. 'cache/**')",
     )
 
     # 5. 'dataset' subcommand with sub-subcommands

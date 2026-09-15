@@ -224,6 +224,24 @@ def test_cli_parser() -> None:
     assert args.multi_gpu is True
     assert args.datasets == ["user/data1", "user/data2"]
 
+    # Test 'run' parser with output filters
+    args_filtered = parser.parse_args(
+        [
+            "run",
+            "--command",
+            "python -m test",
+            "--title",
+            "Test Filter",
+            "--include-outputs",
+            "outputs/**",
+            "*.json",
+            "--exclude-outputs",
+            "cache/**",
+        ]
+    )
+    assert args_filtered.include_outputs == ["outputs/**", "*.json"]
+    assert args_filtered.exclude_outputs == ["cache/**"]
+
     # Test 'dataset push' parser
     ds_args = parser.parse_args(
         ["dataset", "push", "--data-dir", "embeddings/data", "--public"]
@@ -232,6 +250,16 @@ def test_cli_parser() -> None:
     assert ds_args.dataset_action == "push"
     assert ds_args.data_dir == "embeddings/data"
     assert ds_args.public is True
+
+
+def test_match_pattern() -> None:
+    """Test output path glob pattern matching."""
+    from scripts.kaggle_runner.client import _match_pattern
+
+    assert _match_pattern("outputs/summary.json", ["outputs/**"])
+    assert _match_pattern("outputs/summary.json", ["*.json"])
+    assert _match_pattern("cache/huggingface/blob", ["cache/**"])
+    assert not _match_pattern("outputs/summary.json", ["cache/**"])
 
 
 def test_stage_kernel_bundle_dry_run(tmp_path: Path) -> None:

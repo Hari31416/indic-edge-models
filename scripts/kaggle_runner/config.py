@@ -64,6 +64,8 @@ class KernelConfig:
     env_vars: Dict[str, str] = field(default_factory=dict)
     output_dir: Optional[Path] = None
     record_file: Optional[Path] = None
+    include_outputs: List[str] = field(default_factory=list)
+    exclude_outputs: List[str] = field(default_factory=list)
 
     def __post_init__(self) -> None:
         """Validate and normalize configuration values."""

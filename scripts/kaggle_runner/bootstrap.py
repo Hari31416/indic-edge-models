@@ -164,8 +164,10 @@ def main() -> int:
     for k, v in ENV_VARS.items():
         os.environ[k] = str(v)
 
-    # Default caching paths
-    os.environ.setdefault("HF_HOME", "/kaggle/working/cache/huggingface")
+    # Default caching paths in /tmp so they do not bloat the output bundle
+    os.environ.setdefault("HF_HOME", "/tmp/huggingface")
+    os.environ.setdefault("TRANSFORMERS_CACHE", "/tmp/huggingface")
+    os.environ.setdefault("HF_DATASETS_CACHE", "/tmp/huggingface")
     os.environ.setdefault("PYTHONUNBUFFERED", "1")
 
     print_environment_info()
