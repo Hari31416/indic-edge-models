@@ -21,7 +21,8 @@ This sequence will change as results arrive. Complete the next useful experiment
 - Keep original query and document identifiers. Group translations and script variants with their source examples when splitting.
 - Create a clearly labeled synthetic Romanized evaluation slice from existing retrieval queries if appropriate. Check that transformations preserve meaning.
 - Use Dakshina for Romanization robustness, not as a replacement for search relevance judgments.
-- Include natural code-mixed retrieval only when suitable public relevance labels are available. Otherwise record this as an evaluation gap.
+- Include natural code-mixed retrieval only when suitable public relevance labels are available. Otherwise record this as an evaluation gap. Linguistically grounded mixed-script evaluation (entity/loanword preservation, phrase-level code-switching) is deferred to later roadmap phases.
+
 
 E5 has seen MIRACL training data. Its held-out splits remain useful comparisons, but do not establish performance on an entirely unseen task distribution.
 

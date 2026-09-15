@@ -27,6 +27,14 @@ Store small reports/configurations beside the record. Reference large datasets, 
 
 A step is complete when its record contains the actual status, outputs, and resulting decision; the subproject's experiment index links to it; and any affected `STEPS.md` or README status has been updated. An interrupted run remains incomplete with a recorded resume point.
 
-## Data Creation Guidlines
+## Data Creation Guidelines
 
 - Whenever downloading or creating datasets for training or evaluation, make sure to analyze some random sample of raw data and understand its quality, format, and characteristics and confirm that it make sense.
+
+## Remote Kaggle execution
+
+- **Use runner CLI:** Dispatch workloads with `scripts/run_kaggle.py push` (non-blocking), stream live logs with `status --stream`, and download results with `pull`.
+- **Isolate scratch data in `/tmp`:** Kaggle bundles everything in `/kaggle/working/` into downloadable artifacts. Direct raw datasets and caches to `/tmp/` and save only final models/metrics in `/kaggle/working/outputs/`.
+- **Generate remote data in-command:** Ephemeral containers start clean; chain data creation commands before execution (e.g. `python -m ...build_data --output-dir /tmp/data && python -m ...train --data-dir /tmp/data`) or attach a dataset with `--datasets`.
+- **Avoid `DataParallel` on modern encoders:** Submodule device lookups in modern architectures (ModernBERT, mmBERT, RoPE) fail under `torch.nn.DataParallel`. Use single-device GPU or `torchrun` with `--multi-gpu` for PyTorch DDP.
+- **Maintain flat experiment outputs:** Record kernel IDs and statuses in `experiments/YYYY-MM-DD-<name>/README.md`, and pull result JSONs directly to the experiment directory without nested folder structures.
