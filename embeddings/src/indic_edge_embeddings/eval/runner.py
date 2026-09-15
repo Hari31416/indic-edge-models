@@ -95,16 +95,13 @@ class DenseRetrievalEvaluator:
             self.max_length,
             self.fp16,
         )
-        self.tokenizer = AutoTokenizer.from_pretrained(self.model_name)
-        base_model = AutoModel.from_pretrained(self.model_name)
+        self.tokenizer = AutoTokenizer.from_pretrained(
+            self.model_name, trust_remote_code=True
+        )
+        base_model = AutoModel.from_pretrained(self.model_name, trust_remote_code=True)
         self.hidden_dim = base_model.config.hidden_size
 
-        if self.device.type == "cuda" and torch.cuda.device_count() > 1:
-            num_gpus = torch.cuda.device_count()
-            logger.info("Enabling DataParallel across %d CUDA GPUs.", num_gpus)
-            self.model = torch.nn.DataParallel(base_model).to(self.device)
-        else:
-            self.model = base_model.to(self.device)
+        self.model = base_model.to(self.device)
 
         self.model.eval()
 

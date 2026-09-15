@@ -237,26 +237,32 @@ def pull_kernel_output(
     effective_excludes = list(exclude_patterns or DEFAULT_OUTPUT_EXCLUDES)
     api = get_kaggle_api()
 
-    # If user specified a single include prefix (e.g. 'outputs/**' or 'outputs/*'), pass server-side pattern
-    server_pattern = None
-    if include_patterns and len(include_patterns) == 1:
-        pat = include_patterns[0]
-        if pat.endswith("/**"):
-            server_pattern = pat[:-3] + "/*"
-        elif not pat.startswith("*"):
-            server_pattern = pat
+    # Derive server-side patterns to avoid downloading the entire working directory
+    patterns_to_fetch: List[Optional[str]] = []
+    if include_patterns:
+        for pat in include_patterns:
+            if pat.endswith("/**"):
+                patterns_to_fetch.append(pat[:-3] + "/*")
+            else:
+                patterns_to_fetch.append(pat)
+    else:
+        patterns_to_fetch = ["outputs/*"]
 
     saved_files: List[Path] = []
 
     with tempfile.TemporaryDirectory() as tmp_dir:
         tmp_path = Path(tmp_dir)
-        api.kernels_output(
-            kernel_id,
-            path=str(tmp_path),
-            file_pattern=server_pattern,
-            force=True,
-            quiet=False,
-        )
+        for s_pat in patterns_to_fetch:
+            try:
+                api.kernels_output(
+                    kernel_id,
+                    path=str(tmp_path),
+                    file_pattern=s_pat,
+                    force=True,
+                    quiet=True,
+                )
+            except Exception as e:
+                logger.debug("Server fetch pattern '%s' encountered: %s", s_pat, e)
 
         for file_path in tmp_path.rglob("*"):
             if not file_path.is_file():
@@ -274,7 +280,11 @@ def pull_kernel_output(
                 logger.debug("Skipping non-included output file: %s", rel_str)
                 continue
 
-            dest_file = destination_dir / rel_str
+            clean_rel = rel_str
+            if destination_dir.name == "outputs" and rel_str.startswith("outputs/"):
+                clean_rel = rel_str[len("outputs/") :]
+
+            dest_file = destination_dir / clean_rel
             dest_file.parent.mkdir(parents=True, exist_ok=True)
             shutil.copy2(file_path, dest_file)
             saved_files.append(dest_file)

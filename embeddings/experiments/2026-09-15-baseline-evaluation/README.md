@@ -45,39 +45,42 @@ Status: Completed for `intfloat/multilingual-e5-small`.
 
 ## Outputs
 
-| Model                   | Variant | Size (MB) | Parity (Mean Cos) | Native nDCG@10 | Native Recall@20 | Native MRR@10 | Romanized nDCG@10 | Romanized Recall@20 | Romanized MRR@10 |
-| ----------------------- | ------- | --------- | ----------------- | -------------- | ---------------- | ------------- | ----------------- | ------------------- | ---------------- |
-| `multilingual-e5-small` | FP32    | 1.62*     | 1.000000          | 0.5513         | 0.7766           | 0.5722        | 0.0006            | 0.0043              | 0.0004           |
-| `multilingual-e5-small` | INT8    | 113.70    | 0.991866          | -              | -                | -             | -                 | -                   | -                |
+| Model                                  | Params | Vocab   | Pooling | Native nDCG@10 | Native Recall@20 | Native MRR@10 | Romanized nDCG@10 | Romanized Recall@20 | Romanized MRR@10 |
+| -------------------------------------- | ------ | ------- | ------- | -------------- | ---------------- | ------------- | ----------------- | ------------------- | ---------------- |
+| `intfloat/multilingual-e5-small`       | 118M   | 250,037 | mean    | 0.5513         | 0.7766           | 0.5722        | 0.0006            | 0.0043              | 0.0004           |
+| `ibm-granite/granite-embedding-97m-r2` | 97M    | 128,000 | cls     | 0.4574         | 0.6586           | 0.4999        | 0.0008            | 0.0024              | 0.0014           |
+| `hotchpotch/bekko-embedding-v1-a25m`   | 124M*  | 250,000 | mean    | 0.5195         | 0.7440           | 0.5517        | 0.0036            | 0.0115              | 0.0037           |
 
-*Note: FP32 graph references external weights; INT8 dynamic package is self-contained at 113.70 MB.
+*Note: Bekko-a25m contains ~25M active transformer parameters across 13 structural layers.
+
+Export Characteristics (E5 Small):
+- FP32 ONNX Size: 1.62 MB (graph only, external weights) / 470 MB full.
+- INT8 ONNX Dynamic Size: 113.70 MB.
+- INT8 Parity (Mean Cosine Similarity): 0.991866.
 
 Raw results stored in:
-- `experiments/2026-09-15-baseline-evaluation/e5_small_native.json`
-- `experiments/2026-09-15-baseline-evaluation/e5_small_romanized.json`
-- `artifacts/e5_small_onnx/export_report.json`
+- `e5_small_native.json`
+- `e5_small_romanized.json`
+- `granite_native.json`
+- `granite_romanized.json`
+- `bekko_25m_native.json`
+- `bekko_25m_romanized.json`
 
 ## Interpretation
 
-1. **Native Hindi Retrieval:** `multilingual-e5-small` establishes a solid baseline on native Devanagari Hindi (nDCG@10 of `0.5513`, Recall@20 of `0.7766`).
-2. **Catastrophic Failure on Romanized Hindi:** When the exact same queries are transliterated into Latin script (Hinglish search), E5-small retrieval collapses almost completely (nDCG@10 of `0.0006`, Recall@20 of `0.0043`). This empirically validates our core hypothesis: published multilingual models cannot bridge the script gap without explicit alignment.
-3. **Footprint Bottleneck:** At 113.70 MB for INT8, E5-small's 250,037 vocabulary table dominates weight storage, confirming that vocabulary pruning is necessary to hit an edge/browser download budget (<35 MB).
+1. **Universal Romanization Failure across All Base Models:** Every single published multilingual candidate collapses on Romanized Hindi search queries (`nDCG@10 < 0.004` across the board, compared to `0.45 - 0.55` on native script). This confirms that zero-shot cross-script retrieval cannot be assumed for any existing compact model and proves the absolute necessity of our planned script alignment fine-tuning (Step 4).
+2. **Native Retrieval Quality Hierarchy:**
+   - `multilingual-e5-small` achieves the strongest native Hindi ranking (`nDCG@10 = 0.5513`, `Recall@20 = 0.7766`).
+   - `bekko-embedding-v1-a25m` achieves competitive native retrieval (`nDCG@10 = 0.5195`, `Recall@20 = 0.7440`) despite using only 13 layers / ~25M active parameters.
+   - `granite-embedding-97m-r2` scores lower on MIRACL Hindi (`nDCG@10 = 0.4574`, `Recall@20 = 0.6586`).
+3. **Storage Bottleneck:** All models with full ~250k multilingual tokenizers exceed 100 MB in INT8 weight storage, confirming that vocabulary reduction is essential to achieve our <35 MB target browser bundle.
 
 ## Decision
 
-- Adopt `intfloat/multilingual-e5-small` as the primary base checkpoint for the training pilot.
-- Focus pilot fine-tuning on bridging the Romanization gap on our curated `pilot_hindi_100k` dataset with hard negatives.
-- Measure adaptation gains on Romanized retrieval while enforcing a regression limit on native Hindi retrieval (maintaining nDCG@10 > 0.53).
-- Investigate vocabulary pruning as a decoupled compression step after adaptation.
+- Adopt `intfloat/multilingual-e5-small` as the primary base checkpoint for the training pilot, with `hotchpotch/bekko-embedding-v1-a25m` as an efficient student/distillation target.
+- Proceed with pilot fine-tuning on `pilot_hindi_100k` (Step 4) to bridge the Romanization gap while enforcing native retrieval preservation (`nDCG@10 > 0.53`).
+- Implement post-training vocabulary pruning and INT8 dynamic quantization (Step 5) to compress the model to client-side browser budget.
 
 ## Next step
 
-Proceed to Step 4 of the roadmap: Train the pilot adaptation model on `pilot_hindi_100k` using Kaggle 2x T4 GPUs via `run_on_kaggle.py`.
-
-### Kaggle Remote Execution
-
-- **Kernel ID:** `hari31416/e5-eval-benchmark-kaggle`
-- **Kernel URL:** https://www.kaggle.com/code/hari31416/e5-eval-benchmark-kaggle
-- **Completed At:** 2026-09-15 13:57:54 UTC
-- **Status:** `ERROR`
-- **Downloaded Outputs:** `kaggle_outputs`
+Proceed to Step 4 of the roadmap: Train the pilot adaptation model on `pilot_hindi_100k` using Kaggle 2x T4 GPUs via `scripts/run_kaggle.py`.

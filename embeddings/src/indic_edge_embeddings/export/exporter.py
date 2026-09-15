@@ -112,8 +112,10 @@ class EmbeddingExporter:
         self.normalize = normalize
 
         logger.info("Loading tokenizer and model for export: %s", self.model_name)
-        self.tokenizer = AutoTokenizer.from_pretrained(self.model_name)
-        base_model = AutoModel.from_pretrained(self.model_name)
+        self.tokenizer = AutoTokenizer.from_pretrained(
+            self.model_name, trust_remote_code=True
+        )
+        base_model = AutoModel.from_pretrained(self.model_name, trust_remote_code=True)
         self.model = EmbeddingWithPooling(
             base_model=base_model,
             pooling=self.pooling,

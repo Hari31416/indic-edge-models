@@ -1,0 +1,19 @@
+{
+  "model": "ibm-granite/granite-embedding-97m-multilingual-r2",
+  "manifest": "miracl_hi_dev_native_romanized",
+  "metrics": {
+    "ndcg@1": 0.0,
+    "recall@1": 0.0,
+    "mrr@1": 0.0,
+    "ndcg@5": 0.0008459483170453292,
+    "recall@5": 0.0009523809523809524,
+    "mrr@5": 0.0014285714285714286,
+    "ndcg@10": 0.0008459483170453292,
+    "recall@10": 0.0009523809523809524,
+    "mrr@10": 0.0014285714285714286,
+    "ndcg@20": 0.001274539154497723,
+    "recall@20": 0.0023809523809523807,
+    "mrr@20": 0.0016071428571428571,
+    "eval_query_count": 350.0
+  }
+}
