@@ -1,0 +1,19 @@
+{
+  "model": "intfloat/multilingual-e5-small",
+  "manifest": "miracl_hi_dev_native_romanized",
+  "metrics": {
+    "ndcg@1": 0.0,
+    "recall@1": 0.0,
+    "mrr@1": 0.0,
+    "ndcg@5": 0.0,
+    "recall@5": 0.0,
+    "mrr@5": 0.0,
+    "ndcg@10": 0.0005526468674779166,
+    "recall@10": 0.0014285714285714286,
+    "mrr@10": 0.00035714285714285714,
+    "ndcg@20": 0.0012839555097916753,
+    "recall@20": 0.004285714285714286,
+    "mrr@20": 0.0005612244897959184,
+    "eval_query_count": 350.0
+  }
+}

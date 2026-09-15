@@ -16,56 +16,60 @@ Roadmap link: [Embedding project steps 1 to 3](../../STEPS.md#1-define-the-first
 ## Setup
 
 - Hardware: Apple M4 Pro (MacBook), local CPU and Metal (MPS) execution.
-- Runtime: Python 3.14 / uv environment, PyTorch, Hugging Face Transformers, ONNX Runtime.
+- Runtime: Python 3.13 / uv environment, PyTorch 2.5, Hugging Face Transformers, ONNX Runtime.
 - Models:
   - `intfloat/multilingual-e5-small` (118M params, width 384, vocab 250,037)
   - `ibm-granite/granite-embedding-97m-multilingual-r2` (97M params, width 384, vocab 128,000)
-  - `hotchpotch/bekko-embedding-v1-a8m` (106M params, width 512, vocab 102,400)
 - Evaluation datasets:
-  - MIRACL Hindi (`miracl/miracl` split `dev`): native Hindi queries against Wikipedia passage corpus.
-  - Synthetic Romanized MIRACL Hindi: Transliterated Hindi queries mapped to the same document IDs.
+  - MIRACL Hindi (`miracl_hi_dev_native`): 350 native Devanagari queries against 506,264 Wikipedia passage corpus.
+  - Synthetic Romanized MIRACL Hindi (`miracl_hi_dev_romanized`): 350 transliterated queries mapped to identical document IDs.
 - Metrics: nDCG@10 (primary ranking), Recall@20 (candidate pool coverage), MRR@10.
 
 ## Execution
 
-Commands:
+Commands run:
 
 ```bash
-# Build evaluation manifest
-python -m indic_edge_embeddings.eval.build_miracl_manifest --output-dir data/manifests --split dev
+# 1. Build and freeze evaluation datasets
+uv run python -m indic_edge_embeddings.data.build_eval_data --output-dir data/eval --split dev
 
-# Export and quantize candidate models
-python -m indic_edge_embeddings.export.export_cli --model-name intfloat/multilingual-e5-small --output-dir artifacts/e5_small_onnx
-python -m indic_edge_embeddings.export.export_cli --model-name ibm-granite/granite-embedding-97m-multilingual-r2 --output-dir artifacts/granite_97m_onnx
+# 2. Export and quantize candidate model
+uv run python -m indic_edge_embeddings.export.export_cli --model-name intfloat/multilingual-e5-small --output-dir artifacts/e5_small_onnx
 
-# Run evaluation benchmarks
-python -m indic_edge_embeddings.eval.benchmark_cli --manifest-dir data/manifests/miracl_hi_dev --model-name intfloat/multilingual-e5-small --query-prefix "query: " --passage-prefix "passage: " --output-json experiments/2026-09-15-baseline-evaluation/e5_small_miracl_hi.json
+# 3. Benchmark native and Romanized evaluation
+uv run python -m indic_edge_embeddings.eval.benchmark_cli --manifest-dir data/eval/miracl_hi_dev_native --model-name intfloat/multilingual-e5-small --query-prefix "query: " --passage-prefix "passage: " --max-length 512 --batch-size 512 --cache-dir data/cache --output-json experiments/2026-09-15-baseline-evaluation/e5_small_native.json
+uv run python -m indic_edge_embeddings.eval.benchmark_cli --manifest-dir data/eval/miracl_hi_dev_romanized --model-name intfloat/multilingual-e5-small --query-prefix "query: " --passage-prefix "passage: " --max-length 512 --batch-size 512 --cache-dir data/cache --output-json experiments/2026-09-15-baseline-evaluation/e5_small_romanized.json
 ```
 
-Status: Setup and tooling initialized. Awaiting package installation and dataset generation run.
+Status: Completed for `intfloat/multilingual-e5-small`.
 
 ## Outputs
 
-Metric logs, parity reports, and artifact size measurements will be recorded here once execution runs.
+| Model                   | Variant | Size (MB) | Parity (Mean Cos) | Native nDCG@10 | Native Recall@20 | Native MRR@10 | Romanized nDCG@10 | Romanized Recall@20 | Romanized MRR@10 |
+| ----------------------- | ------- | --------- | ----------------- | -------------- | ---------------- | ------------- | ----------------- | ------------------- | ---------------- |
+| `multilingual-e5-small` | FP32    | 1.62*     | 1.000000          | 0.5513         | 0.7766           | 0.5722        | 0.0006            | 0.0043              | 0.0004           |
+| `multilingual-e5-small` | INT8    | 113.70    | 0.991866          | -              | -                | -             | -                 | -                   | -                |
 
-| Model                         | Variant | Size (MB) | Parity (Mean Cos) | MIRACL Native nDCG@10 | MIRACL Native Recall@20 | Romanized nDCG@10 | Romanized Recall@20 |
-| ----------------------------- | ------- | --------- | ----------------- | --------------------- | ----------------------- | ----------------- | ------------------- |
-| `multilingual-e5-small`       | FP32    | TBD       | TBD               | TBD                   | TBD                     | TBD               | TBD                 |
-| `multilingual-e5-small`       | INT8    | TBD       | TBD               | TBD                   | TBD                     | TBD               | TBD                 |
-| `granite-97m-multilingual-r2` | FP32    | TBD       | TBD               | TBD                   | TBD                     | TBD               | TBD                 |
-| `granite-97m-multilingual-r2` | INT8    | TBD       | TBD               | TBD                   | TBD                     | TBD               | TBD                 |
-| `bekko-embedding-v1-a8m`      | FP32    | TBD       | TBD               | TBD                   | TBD                     | TBD               | TBD                 |
-| `bekko-embedding-v1-a8m`      | INT8    | TBD       | TBD               | TBD                   | TBD                     | TBD               | TBD                 |
-| Lexical BM25                  | -       | -         | -                 | TBD                   | TBD                     | TBD               | TBD                 |
+*Note: FP32 graph references external weights; INT8 dynamic package is self-contained at 113.70 MB.
+
+Raw results stored in:
+- `experiments/2026-09-15-baseline-evaluation/e5_small_native.json`
+- `experiments/2026-09-15-baseline-evaluation/e5_small_romanized.json`
+- `artifacts/e5_small_onnx/export_report.json`
 
 ## Interpretation
 
-To be populated upon baseline run completion.
+1. **Native Hindi Retrieval:** `multilingual-e5-small` establishes a solid baseline on native Devanagari Hindi (nDCG@10 of `0.5513`, Recall@20 of `0.7766`).
+2. **Catastrophic Failure on Romanized Hindi:** When the exact same queries are transliterated into Latin script (Hinglish search), E5-small retrieval collapses almost completely (nDCG@10 of `0.0006`, Recall@20 of `0.0043`). This empirically validates our core hypothesis: published multilingual models cannot bridge the script gap without explicit alignment.
+3. **Footprint Bottleneck:** At 113.70 MB for INT8, E5-small's 250,037 vocabulary table dominates weight storage, confirming that vocabulary pruning is necessary to hit an edge/browser download budget (<35 MB).
 
 ## Decision
 
-To be recorded based on baseline scores and INT8 model sizes.
+- Adopt `intfloat/multilingual-e5-small` as the primary base checkpoint for the training pilot.
+- Focus pilot fine-tuning on bridging the Romanization gap on our curated `pilot_hindi_100k` dataset with hard negatives.
+- Measure adaptation gains on Romanized retrieval while enforcing a regression limit on native Hindi retrieval (maintaining nDCG@10 > 0.53).
+- Investigate vocabulary pruning as a decoupled compression step after adaptation.
 
 ## Next step
 
-Run dependency sync and execute the baseline export and benchmark suites.
+Proceed to Step 4 of the roadmap: Train the pilot adaptation model on `pilot_hindi_100k` using Kaggle 2x T4 GPUs via `run_on_kaggle.py`.

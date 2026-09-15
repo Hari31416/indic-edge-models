@@ -39,6 +39,7 @@ data/
 **/data/
 artifacts/
 **/artifacts/
+.kaggle_staging/
 *.onnx
 *.bin
 *.safetensors

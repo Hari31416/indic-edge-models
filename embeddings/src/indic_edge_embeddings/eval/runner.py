@@ -122,15 +122,19 @@ class DenseRetrievalEvaluator:
             sort_indices = None
             ordered_texts = prefixed_texts
 
-        all_embeddings: List[np.ndarray] = []
-        total_batches = (len(ordered_texts) + self.batch_size - 1) // self.batch_size
+        num_texts = len(ordered_texts)
+        hidden_dim = self.model.config.hidden_size
+        output_matrix = np.empty((num_texts, hidden_dim), dtype=np.float32)
+        total_batches = (num_texts + self.batch_size - 1) // self.batch_size
 
         with torch.inference_mode():
-            for i in tqdm(
-                range(0, len(ordered_texts), self.batch_size),
-                total=total_batches,
-                desc=desc,
-                ncols=85,
+            for batch_idx, i in enumerate(
+                tqdm(
+                    range(0, num_texts, self.batch_size),
+                    total=total_batches,
+                    desc=desc,
+                    ncols=85,
+                )
             ):
                 batch_texts = ordered_texts[i : i + self.batch_size]
                 encoded = self.tokenizer(
@@ -153,13 +157,16 @@ class DenseRetrievalEvaluator:
                     raise ValueError(f"Unsupported pooling strategy: {self.pooling}")
 
                 if self.normalize:
-                    embeddings = torch.nn.functional.normalize(
-                        embeddings, p=2, dim=1
-                    )
+                    embeddings = torch.nn.functional.normalize(embeddings, p=2, dim=1)
 
-                all_embeddings.append(embeddings.cpu().numpy())
+                batch_len = len(batch_texts)
+                output_matrix[i : i + batch_len] = embeddings.cpu().numpy()
 
-        stacked = np.vstack(all_embeddings)
+                del encoded, outputs, embeddings
+                if self.device.type == "mps" and (batch_idx + 1) % 25 == 0:
+                    torch.mps.empty_cache()
+
+        stacked = output_matrix
         if sort_indices is not None:
             # Restore original sequence order
             revert_indices = np.argsort(sort_indices)
