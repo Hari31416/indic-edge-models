@@ -26,3 +26,7 @@ Each record must contain:
 Store small reports/configurations beside the record. Reference large datasets, caches, and weights by reproducible locations instead of committing them. Preserve failed runs and superseded decisions; link later records rather than rewriting history as if the outcome were known beforehand.
 
 A step is complete when its record contains the actual status, outputs, and resulting decision; the subproject's experiment index links to it; and any affected `STEPS.md` or README status has been updated. An interrupted run remains incomplete with a recorded resume point.
+
+## Data Creation Guidlines
+
+- Whenever downloading or creating datasets for training or evaluation, make sure to analyze some random sample of raw data and understand its quality, format, and characteristics and confirm that it make sense.

@@ -6,4 +6,4 @@ Before recording a run, read the [shared experiment-record rules](../../AGENTS.m
 
 ## Records
 
-Add one entry per record with a relative link, date, status, question, and resulting decision. Read relevant entries before continuing the [roadmap](../STEPS.md).
+- [2026-09-15 baseline evaluation](2026-09-15-baseline-evaluation/README.md): Date 2026-09-15. Status: in progress. Question: What are the baseline retrieval scores and INT8 export sizes for published compact multilingual models on native and Romanized Hindi? Decision: Pending baseline execution.
