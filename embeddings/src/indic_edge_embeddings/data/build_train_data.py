@@ -288,7 +288,7 @@ def main() -> None:
     parser.add_argument(
         "--output-dir",
         type=str,
-        default="data/train/pilot_hindi_100k_romanized_v2",
+        default="data/train/pilot_hindi_100k",
         help="Destination directory for training files",
     )
     parser.add_argument(
