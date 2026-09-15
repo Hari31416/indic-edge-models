@@ -10,22 +10,24 @@ from scripts.kaggle_runner.config import KernelConfig
 
 logger = logging.getLogger(__name__)
 
-# Files and directories to ignore when packaging python source
-EXCLUDE_PATTERNS = {
+# Root directories to ignore at the subproject root level
+ROOT_EXCLUDES = {
     ".venv",
     "venv",
-    "__pycache__",
-    ".pytest_cache",
-    ".mypy_cache",
-    ".git",
-    ".DS_Store",
-    "*.pyc",
-    "*.pyo",
-    "*.pyd",
-    "*.egg-info",
     "artifacts",
     "experiments",
     "data",
+    ".pytest_cache",
+    ".mypy_cache",
+    ".git",
+}
+
+# Patterns to ignore anywhere in the file tree
+GLOBAL_IGNORE_NAMES = {
+    "__pycache__",
+    ".pytest_cache",
+    ".mypy_cache",
+    ".DS_Store",
 }
 
 MAX_KERNEL_UPLOAD_BYTES = 80 * 1024 * 1024  # 80 MB safe margin under Kaggle 100MB limit
@@ -34,11 +36,23 @@ MAX_KERNEL_UPLOAD_BYTES = 80 * 1024 * 1024  # 80 MB safe margin under Kaggle 100
 def _should_exclude(path: Path, root: Path) -> bool:
     """Check if a given path should be excluded from package bundle."""
     rel = path.relative_to(root)
-    for part in rel.parts:
-        if part in EXCLUDE_PATTERNS or part.endswith(".egg-info"):
+    parts = rel.parts
+
+    # If file is directly under a root excluded folder (not under src/)
+    if len(parts) > 1 and parts[0] != "src" and parts[0] in ROOT_EXCLUDES:
+        return True
+
+    # Check global ignores and extensions
+    for part in parts:
+        if (
+            part in GLOBAL_IGNORE_NAMES
+            or part.endswith(".egg-info")
+            or part.endswith(".pyc")
+        ):
             return True
         if part.startswith(".") and part not in {".", ".."}:
             return True
+
     return False
 
 

@@ -1,5 +1,6 @@
 """Generator for the remote Kaggle bootstrap orchestrator script."""
 
+import base64
 import json
 import logging
 from pathlib import Path
@@ -11,6 +12,7 @@ logger = logging.getLogger(__name__)
 
 BOOTSTRAP_TEMPLATE = '''"""Bootstrap orchestrator executed remotely inside Kaggle kernel."""
 
+import base64
 import json
 import os
 import shutil
@@ -25,7 +27,8 @@ TARGET_COMMAND = __TARGET_COMMAND_JSON__
 MULTI_GPU = __MULTI_GPU_JSON__
 EXTRA_PIP_DEPS = __EXTRA_PIP_DEPS_JSON__
 ENV_VARS = __ENV_VARS_JSON__
-HAS_DATA_PAYLOAD = __HAS_DATA_PAYLOAD_JSON__
+PKG_PAYLOAD_B64 = __PKG_PAYLOAD_B64_JSON__
+DATA_PAYLOAD_B64 = __DATA_PAYLOAD_B64_JSON__
 
 
 def log(msg: str) -> None:
@@ -40,7 +43,7 @@ def print_environment_info() -> None:
     log("Diagnostic & System Information:")
     log(f"Python: {sys.version.split()[0]} ({sys.executable})")
     log(f"Working Directory: {os.getcwd()}")
-    
+
     try:
         import torch
         log(f"PyTorch Version: {torch.__version__}")
@@ -70,9 +73,8 @@ def print_environment_info() -> None:
 
 def extract_package_and_install() -> None:
     """Extract local package source and install in editable mode."""
-    pkg_zip = Path("pkg_payload.zip")
-    if not pkg_zip.exists():
-        log("No pkg_payload.zip found in kernel directory.")
+    if not PKG_PAYLOAD_B64:
+        log("No package payload provided.")
         return
 
     extract_dir = Path("/kaggle/working/pkg_src")
@@ -80,7 +82,10 @@ def extract_package_and_install() -> None:
         shutil.rmtree(extract_dir)
     extract_dir.mkdir(parents=True, exist_ok=True)
 
-    log(f"Extracting {pkg_zip} to {extract_dir}...")
+    pkg_zip = Path("/kaggle/working/pkg_payload.zip")
+    pkg_zip.write_bytes(base64.b64decode(PKG_PAYLOAD_B64.encode("ascii")))
+
+    log(f"Extracting package payload to {extract_dir}...")
     with zipfile.ZipFile(pkg_zip, "r") as zf:
         zf.extractall(extract_dir)
 
@@ -90,25 +95,24 @@ def extract_package_and_install() -> None:
         sys.path.insert(0, str(src_dir.resolve()))
         log(f"Added {src_dir} to sys.path.")
 
-    # Pip install in editable mode without reinstalling existing heavy packages
-    log(f"Installing package from {extract_dir} in editable mode...")
-    cmd = [sys.executable, "-m", "pip", "install", "--no-deps", "-e", str(extract_dir)]
+    # Pip install in editable mode to ensure all project requirements are met
+    log(f"Installing subproject dependencies from {extract_dir} in editable mode...")
+    cmd = [sys.executable, "-m", "pip", "install", "-e", str(extract_dir)]
     res = subprocess.run(cmd, capture_output=True, text=True)
     if res.returncode != 0:
-        log(f"Editable install warning: {res.stderr}")
+        log(f"Pip install output: {res.stdout}")
+        log(f"Pip install stderr: {res.stderr}")
     else:
         log("Successfully installed subproject package.")
 
 
 def extract_data_payload() -> None:
     """Extract bundled data payload if present."""
-    if not HAS_DATA_PAYLOAD:
+    if not DATA_PAYLOAD_B64:
         return
 
-    data_zip = Path("data_payload.zip")
-    if not data_zip.exists():
-        log("data_payload.zip specified but file not found.")
-        return
+    data_zip = Path("/kaggle/working/data_payload.zip")
+    data_zip.write_bytes(base64.b64decode(DATA_PAYLOAD_B64.encode("ascii")))
 
     log("Extracting data payload to /kaggle/working...")
     with zipfile.ZipFile(data_zip, "r") as zf:
@@ -128,7 +132,7 @@ def install_extra_deps() -> None:
 def build_execution_command() -> str:
     """Wrap command with torchrun if multi-GPU is enabled."""
     cmd = TARGET_COMMAND.strip()
-    
+
     if MULTI_GPU:
         try:
             import torch
@@ -138,14 +142,13 @@ def build_execution_command() -> str:
 
         if num_gpus > 1:
             log(f"Multi-GPU enabled: wrapping command with torchrun for {num_gpus} GPUs.")
-            # If command starts with 'python -m', convert to torchrun --nproc_per_node=N -m
             if cmd.startswith("python -m "):
                 module_part = cmd[len("python -m "):]
                 cmd = f"torchrun --nproc_per_node={num_gpus} -m {module_part}"
             elif cmd.startswith("python "):
                 script_part = cmd[len("python "):]
                 cmd = f"torchrun --nproc_per_node={num_gpus} {script_part}"
-    
+
     return cmd
 
 
@@ -221,19 +224,29 @@ if __name__ == "__main__":
 
 def generate_bootstrap_script(
     config: KernelConfig,
-    has_data_payload: bool,
+    pkg_zip_path: Optional[Path],
+    data_zip_path: Optional[Path],
     output_path: Path,
 ) -> Path:
-    """Generate and write kaggle_bootstrap.py with injected parameters.
+    """Generate and write kaggle_bootstrap.py with injected parameters and embedded payloads.
 
     Args:
         config: Kernel configuration.
-        has_data_payload: Whether data_payload.zip is bundled in staging.
+        pkg_zip_path: Path to package zip payload.
+        data_zip_path: Path to optional data zip payload.
         output_path: Target path for kaggle_bootstrap.py.
 
     Returns:
         Path to the generated bootstrap script.
     """
+    pkg_b64 = ""
+    if pkg_zip_path and pkg_zip_path.exists():
+        pkg_b64 = base64.b64encode(pkg_zip_path.read_bytes()).decode("ascii")
+
+    data_b64 = ""
+    if data_zip_path and data_zip_path.exists():
+        data_b64 = base64.b64encode(data_zip_path.read_bytes()).decode("ascii")
+
     script_content = (
         BOOTSTRAP_TEMPLATE.replace(
             "__TARGET_COMMAND_JSON__", json.dumps(config.command)
@@ -241,7 +254,8 @@ def generate_bootstrap_script(
         .replace("__MULTI_GPU_JSON__", repr(config.multi_gpu))
         .replace("__EXTRA_PIP_DEPS_JSON__", json.dumps(config.extra_pip_deps))
         .replace("__ENV_VARS_JSON__", json.dumps(config.env_vars))
-        .replace("__HAS_DATA_PAYLOAD_JSON__", repr(has_data_payload))
+        .replace("__PKG_PAYLOAD_B64_JSON__", json.dumps(pkg_b64))
+        .replace("__DATA_PAYLOAD_B64_JSON__", json.dumps(data_b64))
     )
 
     output_path.parent.mkdir(parents=True, exist_ok=True)

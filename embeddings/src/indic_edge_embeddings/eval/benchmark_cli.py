@@ -28,6 +28,7 @@ def run_benchmark(
     device: Optional[str] = None,
     cache_dir: Optional[str] = None,
     output_json: Optional[str] = None,
+    fp16: bool = True,
 ) -> None:
     """Load manifest, evaluate candidate model, and save/log results."""
     logger.info("Loading manifest from %s", manifest_dir)
@@ -42,6 +43,7 @@ def run_benchmark(
         batch_size=batch_size,
         device=device,
         cache_dir=cache_dir,
+        fp16=fp16,
     )
 
     metrics, _ = evaluator.evaluate(manifest)
@@ -121,6 +123,11 @@ def main() -> None:
         help="Execution device ('mps', 'cuda', 'cpu')",
     )
     parser.add_argument(
+        "--no-fp16",
+        action="store_true",
+        help="Disable FP16 mixed precision on CUDA",
+    )
+    parser.add_argument(
         "--cache-dir",
         type=str,
         default=None,
@@ -145,6 +152,7 @@ def main() -> None:
         device=args.device,
         cache_dir=args.cache_dir,
         output_json=args.output_json,
+        fp16=not args.no_fp16,
     )
 
 

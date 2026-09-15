@@ -157,8 +157,18 @@ def test_generate_bootstrap_script(tmp_path: Path) -> None:
         extra_pip_deps=["scikit-learn>=1.4.0"],
         env_vars={"WANDB_MODE": "disabled"},
     )
+    fake_pkg = tmp_path / "pkg.zip"
+    fake_pkg.write_bytes(b"fake zip content")
+    fake_data = tmp_path / "data.zip"
+    fake_data.write_bytes(b"fake data content")
+
     bootstrap_file = tmp_path / "kaggle_bootstrap.py"
-    generate_bootstrap_script(cfg, has_data_payload=True, output_path=bootstrap_file)
+    generate_bootstrap_script(
+        cfg,
+        pkg_zip_path=fake_pkg,
+        data_zip_path=fake_data,
+        output_path=bootstrap_file,
+    )
 
     assert bootstrap_file.exists()
     content = bootstrap_file.read_text(encoding="utf-8")
@@ -166,7 +176,7 @@ def test_generate_bootstrap_script(tmp_path: Path) -> None:
     assert "torchrun --nproc_per_node=" in content
     assert "scikit-learn>=1.4.0" in content
     assert "WANDB_MODE" in content
-    assert "pkg_payload.zip" in content
+    assert "PKG_PAYLOAD_B64" in content
     # Verify the generated file is syntactically valid Python
     compile(content, "kaggle_bootstrap.py", "exec")
 

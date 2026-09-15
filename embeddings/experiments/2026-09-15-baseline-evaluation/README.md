@@ -73,3 +73,11 @@ Raw results stored in:
 ## Next step
 
 Proceed to Step 4 of the roadmap: Train the pilot adaptation model on `pilot_hindi_100k` using Kaggle 2x T4 GPUs via `run_on_kaggle.py`.
+
+### Kaggle Remote Execution
+
+- **Kernel ID:** `hari31416/e5-eval-benchmark-kaggle`
+- **Kernel URL:** https://www.kaggle.com/code/hari31416/e5-eval-benchmark-kaggle
+- **Completed At:** 2026-09-15 13:57:54 UTC
+- **Status:** `ERROR`
+- **Downloaded Outputs:** `kaggle_outputs`

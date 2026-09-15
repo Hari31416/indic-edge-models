@@ -4,7 +4,7 @@ import json
 import logging
 from pathlib import Path
 import time
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Tuple
 
 logger = logging.getLogger(__name__)
 
@@ -38,14 +38,14 @@ def get_authenticated_username() -> str:
     return str(username)
 
 
-def push_kernel(staging_dir: Path) -> str:
+def push_kernel(staging_dir: Path) -> Tuple[str, str]:
     """Push staged kernel directory to Kaggle.
 
     Args:
         staging_dir: Path containing kernel-metadata.json and code.
 
     Returns:
-        URL of the created/updated Kaggle kernel.
+        Tuple of (actual_kernel_id, kernel_url).
     """
     metadata_file = staging_dir / "kernel-metadata.json"
     if not metadata_file.exists():
@@ -53,17 +53,25 @@ def push_kernel(staging_dir: Path) -> str:
 
     with open(metadata_file, "r", encoding="utf-8") as f:
         meta = json.load(f)
-    kernel_id = meta.get("id")
+    fallback_id = meta.get("id", "")
 
-    logger.info("Pushing kernel '%s' to Kaggle...", kernel_id)
+    logger.info("Pushing kernel '%s' to Kaggle...", fallback_id)
     api = get_kaggle_api()
     response = api.kernels_push(str(staging_dir))
 
-    url = f"https://www.kaggle.com/code/{kernel_id}"
-    logger.info("Kernel pushed successfully: %s", url)
+    actual_id = fallback_id
+    url = f"https://www.kaggle.com/code/{fallback_id}"
+
+    if hasattr(response, "url") and response.url:
+        url = response.url
+        # Extract username/slug from url: https://www.kaggle.com/code/user/slug
+        if "/code/" in url:
+            actual_id = url.split("/code/")[-1].strip("/")
+
+    logger.info("Kernel pushed successfully: %s (id: %s)", url, actual_id)
     if hasattr(response, "error") and response.error:
         logger.warning("Push response error note: %s", response.error)
-    return url
+    return actual_id, url
 
 
 def get_kernel_status(kernel_id: str) -> Dict[str, Any]:
@@ -78,21 +86,28 @@ def get_kernel_status(kernel_id: str) -> Dict[str, Any]:
     api = get_kaggle_api()
     status_obj = api.kernels_status(kernel_id)
 
-    status_str = ""
+    status_str = "unknown"
     failure_msg = None
 
-    if isinstance(status_obj, dict):
-        status_str = status_obj.get("status", "unknown")
-        failure_msg = status_obj.get("failureMessage")
-    elif hasattr(status_obj, "status"):
-        status_str = getattr(status_obj, "status", "unknown")
+    if hasattr(status_obj, "status"):
+        val = getattr(status_obj, "status")
+        if hasattr(val, "name"):
+            status_str = str(val.name).lower()
+        else:
+            status_str = str(val).lower()
         failure_msg = getattr(status_obj, "failure_message", None)
+    elif isinstance(status_obj, dict):
+        status_str = str(status_obj.get("status", "unknown")).lower()
+        failure_msg = status_obj.get("failureMessage")
     else:
-        status_str = str(status_obj)
+        status_str = str(status_obj).lower()
+
+    if "kernelworkerstatus." in status_str:
+        status_str = status_str.split("kernelworkerstatus.")[-1]
 
     return {
         "id": kernel_id,
-        "status": status_str.lower(),
+        "status": status_str,
         "failure_message": failure_msg,
     }
 
@@ -125,8 +140,17 @@ def poll_kernel(
                 f"Kernel {kernel_id} timed out after {elapsed:.0f} seconds."
             )
 
-        status_info = get_kernel_status(kernel_id)
-        current_status = status_info["status"]
+        try:
+            status_info = get_kernel_status(kernel_id)
+            current_status = status_info["status"]
+        except Exception as e:
+            logger.warning(
+                "Transient error checking kernel status (%s). Retrying in %ds...",
+                e,
+                poll_interval_sec,
+            )
+            time.sleep(poll_interval_sec)
+            continue
 
         if current_status != last_status:
             logger.info(

@@ -50,6 +50,7 @@ class DenseRetrievalEvaluator:
         device: Optional[str] = None,
         batch_size: int = 512,
         cache_dir: Optional[Union[str, Path]] = None,
+        fp16: bool = True,
     ) -> None:
         """Initialize dense evaluator.
 
@@ -63,6 +64,7 @@ class DenseRetrievalEvaluator:
             device: Execution device ('cpu', 'cuda', 'mps', or auto-detected).
             batch_size: Batch size for encoding (default: 512).
             cache_dir: Directory to cache encoded corpus vectors.
+            fp16: Enable float16 mixed precision on CUDA (default: True).
         """
         self.model_name = model_name_or_path
         self.query_prefix = query_prefix
@@ -83,15 +85,27 @@ class DenseRetrievalEvaluator:
         else:
             self.device = torch.device(device)
 
+        self.fp16 = fp16 and (self.device.type == "cuda")
+
         logger.info(
-            "Loading model: %s on %s (batch_size=%d, max_length=%d)",
+            "Loading model: %s on %s (batch_size=%d, max_length=%d, fp16=%s)",
             self.model_name,
             self.device,
             self.batch_size,
             self.max_length,
+            self.fp16,
         )
         self.tokenizer = AutoTokenizer.from_pretrained(self.model_name)
-        self.model = AutoModel.from_pretrained(self.model_name).to(self.device)
+        base_model = AutoModel.from_pretrained(self.model_name)
+        self.hidden_dim = base_model.config.hidden_size
+
+        if self.device.type == "cuda" and torch.cuda.device_count() > 1:
+            num_gpus = torch.cuda.device_count()
+            logger.info("Enabling DataParallel across %d CUDA GPUs.", num_gpus)
+            self.model = torch.nn.DataParallel(base_model).to(self.device)
+        else:
+            self.model = base_model.to(self.device)
+
         self.model.eval()
 
     def encode(
@@ -123,9 +137,14 @@ class DenseRetrievalEvaluator:
             ordered_texts = prefixed_texts
 
         num_texts = len(ordered_texts)
-        hidden_dim = self.model.config.hidden_size
-        output_matrix = np.empty((num_texts, hidden_dim), dtype=np.float32)
+        output_matrix = np.empty((num_texts, self.hidden_dim), dtype=np.float32)
         total_batches = (num_texts + self.batch_size - 1) // self.batch_size
+
+        autocast_ctx = (
+            torch.autocast(device_type="cuda", dtype=torch.float16)
+            if self.fp16
+            else torch.inference_mode()
+        )
 
         with torch.inference_mode():
             for batch_idx, i in enumerate(
@@ -145,22 +164,27 @@ class DenseRetrievalEvaluator:
                     return_tensors="pt",
                 ).to(self.device)
 
-                outputs = self.model(**encoded)
+                with autocast_ctx:
+                    outputs = self.model(**encoded)
 
-                if self.pooling == "mean":
-                    embeddings = mean_pooling(
-                        outputs.last_hidden_state, encoded["attention_mask"]
-                    )
-                elif self.pooling == "cls":
-                    embeddings = outputs.last_hidden_state[:, 0]
-                else:
-                    raise ValueError(f"Unsupported pooling strategy: {self.pooling}")
+                    if self.pooling == "mean":
+                        embeddings = mean_pooling(
+                            outputs.last_hidden_state, encoded["attention_mask"]
+                        )
+                    elif self.pooling == "cls":
+                        embeddings = outputs.last_hidden_state[:, 0]
+                    else:
+                        raise ValueError(
+                            f"Unsupported pooling strategy: {self.pooling}"
+                        )
 
-                if self.normalize:
-                    embeddings = torch.nn.functional.normalize(embeddings, p=2, dim=1)
+                    if self.normalize:
+                        embeddings = torch.nn.functional.normalize(
+                            embeddings, p=2, dim=1
+                        )
 
                 batch_len = len(batch_texts)
-                output_matrix[i : i + batch_len] = embeddings.cpu().numpy()
+                output_matrix[i : i + batch_len] = embeddings.float().cpu().numpy()
 
                 del encoded, outputs, embeddings
                 if self.device.type == "mps" and (batch_idx + 1) % 25 == 0:

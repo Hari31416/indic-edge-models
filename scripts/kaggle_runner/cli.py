@@ -71,19 +71,23 @@ def stage_kernel_bundle(
     package_subproject(subproject_dir, pkg_zip)
 
     # 2. Package optional local data
-    has_data_payload = False
+    data_zip_path = None
     if config.include_data:
         data_paths = [Path(p) for p in config.include_data]
         data_zip = staging_dir / "data_payload.zip"
         res = package_local_data(
             data_paths, base_dir=subproject_dir, output_zip=data_zip
         )
-        has_data_payload = res is not None
+        if res is not None:
+            data_zip_path = data_zip
 
-    # 3. Generate remote kaggle_bootstrap.py
+    # 3. Generate remote kaggle_bootstrap.py with embedded payloads
     bootstrap_file = staging_dir / "kaggle_bootstrap.py"
     generate_bootstrap_script(
-        config, has_data_payload=has_data_payload, output_path=bootstrap_file
+        config,
+        pkg_zip_path=pkg_zip,
+        data_zip_path=data_zip_path,
+        output_path=bootstrap_file,
     )
 
     # 4. Generate kernel-metadata.json
@@ -121,18 +125,17 @@ def handle_run(args: argparse.Namespace) -> int:
     user = get_authenticated_username()
     stage_kernel_bundle(config, staging_base, repo_root=repo_root, username=user)
 
-    kernel_id = f"{user}/{config.slug}"
-    push_kernel(staging_base)
+    actual_kernel_id, kernel_url = push_kernel(staging_base)
 
     if args.no_wait:
         logger.info(
             "Kernel submitted. To monitor later, run: python scripts/run_kaggle.py status --kernel %s",
-            kernel_id,
+            actual_kernel_id,
         )
         return 0
 
     # Poll status until complete
-    status_info = poll_kernel(kernel_id, poll_interval_sec=args.poll_interval)
+    status_info = poll_kernel(actual_kernel_id, poll_interval_sec=args.poll_interval)
     terminal_status = status_info.get("status", "")
 
     # Pull outputs if completed and output_dir is specified
@@ -142,7 +145,7 @@ def handle_run(args: argparse.Namespace) -> int:
 
     if destination_dir:
         try:
-            pull_kernel_output(kernel_id, destination_dir)
+            pull_kernel_output(actual_kernel_id, destination_dir)
         except Exception as e:
             logger.error("Failed to pull outputs: %s", e)
 
@@ -150,7 +153,7 @@ def handle_run(args: argparse.Namespace) -> int:
     if config.record_file:
         append_experiment_record(
             record_file=config.record_file,
-            kernel_id=kernel_id,
+            kernel_id=actual_kernel_id,
             status_info=status_info,
             output_dir=destination_dir,
         )
@@ -183,7 +186,8 @@ def handle_push(args: argparse.Namespace) -> int:
 
     user = get_authenticated_username()
     stage_kernel_bundle(config, staging_base, repo_root=repo_root, username=user)
-    push_kernel(staging_base)
+    actual_kernel_id, kernel_url = push_kernel(staging_base)
+    logger.info("Kernel pushed: %s (%s)", kernel_url, actual_kernel_id)
     return 0
 
 
