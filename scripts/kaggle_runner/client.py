@@ -3,6 +3,7 @@
 import json
 import logging
 from pathlib import Path
+import sys
 import time
 from typing import Any, Dict, List, Optional, Tuple
 
@@ -167,6 +168,23 @@ def poll_kernel(
             return status_info
 
         time.sleep(poll_interval_sec)
+
+
+def stream_kernel_logs(kernel_id: str) -> None:
+    """Stream live logs from a running Kaggle kernel in real-time.
+
+    Args:
+        kernel_id: Identifier of the kernel (e.g. 'username/slug').
+    """
+    api = get_kaggle_api()
+    logger.info("Connecting to live log stream for '%s'...", kernel_id)
+    try:
+        for chunk in api.kernels_logs_stream(kernel_id):
+            data = chunk.get("data", "")
+            sys.stdout.write(data)
+            sys.stdout.flush()
+    except Exception as e:
+        logger.debug("Live log streaming ended: %s", e)
 
 
 def pull_kernel_output(kernel_id: str, destination_dir: Path) -> List[Path]:

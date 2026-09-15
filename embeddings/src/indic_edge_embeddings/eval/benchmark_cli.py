@@ -130,8 +130,8 @@ def main() -> None:
     parser.add_argument(
         "--cache-dir",
         type=str,
-        default=None,
-        help="Directory to store cached corpus embeddings",
+        default="data/cache",
+        help="Directory to store cached corpus embeddings (default: 'data/cache')",
     )
     parser.add_argument(
         "--output-json",

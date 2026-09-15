@@ -15,6 +15,7 @@ from scripts.kaggle_runner.client import (
     poll_kernel,
     pull_kernel_output,
     push_kernel,
+    stream_kernel_logs,
 )
 from scripts.kaggle_runner.config import (
     DatasetConfig,
@@ -199,6 +200,7 @@ def handle_status(args: argparse.Namespace) -> int:
         kernel_id = f"{user}/{kernel_id}"
 
     if args.stream:
+        stream_kernel_logs(kernel_id)
         status_info = poll_kernel(kernel_id, poll_interval_sec=args.poll_interval)
         return 0 if status_info.get("status") == "complete" else 1
 
