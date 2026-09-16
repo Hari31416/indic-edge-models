@@ -1,0 +1,104 @@
+{
+  "status": "complete",
+  "config": {
+    "seed": 42,
+    "matched_answers": true,
+    "validation_fraction": 0.2,
+    "inspection_samples": 4,
+    "sources": [
+      {
+        "name": "hi",
+        "family": "msmarco",
+        "format": "msmarco-xi",
+        "language": "hi",
+        "split": "train",
+        "max_queries": 20,
+        "romanized_probability": 1,
+        "files": [
+          {
+            "path": "source.jsonl"
+          }
+        ]
+      }
+    ]
+  },
+  "inputs": [
+    {
+      "path": "/private/tmp/indic-quality-v3-smoke/source.jsonl",
+      "sha256": "2d7c6e0a7731e9ea26dc5253d34888bbbe5e927af7f0cad3ee0e5f74aed7ae19",
+      "source": "hi"
+    }
+  ],
+  "sources": {
+    "hi": {
+      "scanned": 40,
+      "eligible": 40,
+      "sampled_queries": 20
+    }
+  },
+  "python": "3.13.5",
+  "platform": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+  "code_revision": "eaa266b7b9dca967b65e17a3b212b9abb3f6b3f5",
+  "builder_sha256": "9f0c37e229ce6bfa8e7067a387caf5efce4a290e8517ec703ce791893f6161d3",
+  "excluded_related_queries": 0,
+  "outputs": {
+    "passages/train": {
+      "rows": 32,
+      "directions": {
+        "hi/romanized->hi": 16,
+        "hi/native->hi": 16
+      },
+      "sources": {
+        "hi": 32
+      },
+      "negative_rows": 0,
+      "sha256": "7dada8bf11ab9e97e43ef3e0c9427f5d522ee93a326c8487e3caa79d55c3b9e7"
+    },
+    "answers/train": {
+      "rows": 32,
+      "directions": {
+        "hi/romanized->hi": 16,
+        "hi/native->hi": 16
+      },
+      "sources": {
+        "hi": 32
+      },
+      "negative_rows": 0,
+      "sha256": "2b94b894a1a1ade66e8126a9f65bd72643a8e46ec7cfd906ba10edf65039dc12"
+    },
+    "passages/validation": {
+      "rows": 8,
+      "directions": {
+        "hi/romanized->hi": 4,
+        "hi/native->hi": 4
+      },
+      "sources": {
+        "hi": 8
+      },
+      "negative_rows": 0,
+      "sha256": "5d623932c3febf54b9b6ad118d15c0fddb4858554ac254ab599668dbc5e9c4b9"
+    },
+    "answers/validation": {
+      "rows": 8,
+      "directions": {
+        "hi/romanized->hi": 4,
+        "hi/native->hi": 4
+      },
+      "sources": {
+        "hi": 8
+      },
+      "negative_rows": 0,
+      "sha256": "ca1c49c103dddeac129bb42386a32a6b709d0008b70fa5742f4fcc693419f56a"
+    }
+  },
+  "source_queries": 20,
+  "connected_groups": 20,
+  "largest_group": 1,
+  "romanization_failures": 0,
+  "limitations": [
+    "Automatic filters do not establish translation or relevance quality.",
+    "Inspect raw_samples.json before training.",
+    "Word-lexicon augmentation is synthetic, not natural code-mixed supervision.",
+    "Ratios are measured outputs; caps and probabilities do not enforce exact row weights."
+  ]
+}

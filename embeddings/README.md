@@ -12,6 +12,8 @@ Start with [STEPS.md](STEPS.md). It describes the initial sequence and the decis
 
 Agent workflow is in [AGENTS.md](AGENTS.md). Run outputs and resulting decisions belong in [experiments/](experiments/README.md).
 
+Dataset preparation code is available in the [v3 build guide](configs/README.md), including a matched answer/passage control and an optional mixed-source recipe. Offline implementation checks passed; no production v3 training result is available yet.
+
 ## Scope
 
 The model maps queries and passages into vectors for local search. Evaluate these capabilities separately where suitable public data exists:

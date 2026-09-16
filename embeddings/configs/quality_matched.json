@@ -1,0 +1,23 @@
+{
+  "seed": 42,
+  "matched_answers": true,
+  "validation_fraction": 0.05,
+  "inspection_samples": 200,
+  "max_negatives": 0,
+  "exclude": [
+    {"path": "../data/eval/miracl_hi_dev_native/queries.jsonl", "kind": "queries"},
+    {"path": "../data/eval/miracl_hi_dev_romanized/queries.jsonl", "kind": "queries"}
+  ],
+  "sources": [
+    {
+      "name": "msmarco_hi",
+      "family": "msmarco",
+      "format": "msmarco-xi",
+      "language": "hi",
+      "split": "train",
+      "max_queries": 80000,
+      "romanized_probability": 0.3,
+      "files": [{"path": "/tmp/indic-data/hintrain.parquet"}]
+    }
+  ]
+}

@@ -6,6 +6,10 @@ Before recording a run, read the [shared experiment-record rules](../../AGENTS.m
 
 ## Records
 
+- [2026-09-16 dataset builder v3](2026-09-16-dataset-builder-v3/README.md): Implementation complete. Matched answer/passage and mixed-source builders, Dakshina train spelling support, grouped exclusions, and explicit-negative/multi-positive training integration. 35 offline tests pass; production data build and retrieval comparison remain pending.
+
+- [2026-09-16 training data quality](2026-09-16-training-data-quality/README.md): Complete. Inspected full pilot statistics and 60 seeded samples. Useful script-adaptation control, but 92.8% answer-based supervision, translation defects, one synthetic spelling scheme, and no explicit negatives limit passage-retrieval suitability. Recommend a separate corrected passage-supervision comparison.
+
 - [2026-09-15 baseline evaluation](2026-09-15-baseline-evaluation/README.md): Date 2026-09-15. Status: complete. Question: What are the baseline retrieval scores and INT8 export sizes for published compact multilingual models on native and Romanized Hindi? Decision: Confirmed E5-small as base model (Native nDCG@10: 0.5513; Romanized: 0.0006; INT8 size: 113.7 MB). Proceed to pilot fine-tuning on pilot_hindi_100k.
 
 - [2026-09-15 Romanized baseline audit](2026-09-15-romanized-audit/README.md): Complete. Reproduced E5 Romanized nDCG@10 of 0.00055265; query/relevance mapping and corpus checks passed. Found residual Devanagari in 18/350 queries and unnatural synthetic spellings. E5 remains provisional; correct and inspect a separately versioned Romanization slice before the full training pilot. This qualifies the earlier training-readiness decision.

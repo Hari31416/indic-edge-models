@@ -1,0 +1,60 @@
+{
+  "python": "3.14.5 (main, May 10 2026, 10:21:34) [Clang 21.0.0 (clang-2100.0.123.102)]",
+  "platform": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+  "hashes": {
+    "train.jsonl": "03c040f531d53ea0a6c3b4f2496bf9f93b6c2c14e3816ecd7f29e7ab5a8a1888",
+    "validation.jsonl": "5d2e88a629ecb78604dba777fb0ca5ea1efd5e3906f54332e0b7566b35053368"
+  },
+  "train": {
+    "rows": 99994,
+    "source_script": {
+      "msmarco-xi / native": 71399,
+      "indic-swim-ir / native": 5490,
+      "msmarco-xi / romanized": 21374,
+      "indic-swim-ir / romanized": 1731
+    },
+    "language": {
+      "hi": 99994
+    },
+    "explicit_negative_rows": 0,
+    "unique_sources": 76889,
+    "native_duplicate_positive_excess": 952,
+    "positive_no_devanagari": 7774,
+    "positive_words_quantiles": {
+      "0": 1,
+      "0.1": 7,
+      "0.5": 19,
+      "0.9": 47,
+      "0.99": 87,
+      "1": 2338
+    }
+  },
+  "validation": {
+    "rows": 5000,
+    "source_script": {
+      "msmarco-xi / native": 3616,
+      "msmarco-xi / romanized": 1055,
+      "indic-swim-ir / native": 262,
+      "indic-swim-ir / romanized": 67
+    },
+    "language": {
+      "hi": 5000
+    },
+    "explicit_negative_rows": 0,
+    "unique_sources": 3878,
+    "native_duplicate_positive_excess": 15,
+    "positive_no_devanagari": 353,
+    "positive_words_quantiles": {
+      "0": 2,
+      "0.1": 7,
+      "0.5": 18,
+      "0.9": 48,
+      "0.99": 81,
+      "1": 1755
+    }
+  },
+  "overlap_source_query_id": 0,
+  "overlap_split_group_id": 0,
+  "overlap_positive": 47,
+  "overlap_query": 0
+}

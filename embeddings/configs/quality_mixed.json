@@ -1,0 +1,20 @@
+{
+  "seed": 42,
+  "matched_answers": false,
+  "validation_fraction": 0.05,
+  "inspection_samples": 200,
+  "max_negatives": 2,
+  "dakshina_train": {"path": "/tmp/indic-data/hi.translit.sampled.train.tsv", "split": "train"},
+  "exclude": [
+    {"path": "../data/eval/miracl_hi_dev_native/queries.jsonl", "kind": "queries"},
+    {"path": "../data/eval/miracl_hi_dev_romanized/queries.jsonl", "kind": "queries"},
+    {"path": "../data/eval/scifact_en_test/queries.jsonl", "kind": "queries"}
+  ],
+  "sources": [
+    {"name": "msmarco_hi", "family": "msmarco", "format": "msmarco-xi", "language": "hi", "split": "train", "max_queries": 36000, "romanized_probability": 0.666667, "files": [{"path": "/tmp/indic-data/hintrain.parquet"}]},
+    {"name": "miracl_hi", "format": "miracl", "language": "hi", "split": "train", "max_queries": 1169, "romanized_probability": 0.666667, "files": [{"path": "/tmp/indic-data/miracl_hi_train.jsonl"}]},
+    {"name": "indic_rag_hi", "format": "indic-rag", "language": "hi", "split": "train", "max_queries": 7831, "romanized_probability": 0.666667, "files": [{"path": "/tmp/indic-data/indic_rag_hi_train.parquet"}]},
+    {"name": "msmarco_en", "family": "msmarco", "format": "msmarco-xi", "language": "en", "split": "train", "max_queries": 20000, "romanized_probability": 0, "files": [{"path": "/tmp/indic-data/hintrain.parquet"}]},
+    {"name": "swim_hi_en", "format": "swim", "language": "hi", "passage_language": "en", "split": "train", "max_queries": 3000, "romanized_probability": 0.666667, "files": [{"path": "/tmp/indic-data/swim_hi_train.parquet"}]}
+  ]
+}

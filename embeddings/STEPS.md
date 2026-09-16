@@ -45,6 +45,10 @@ A Python transliteration baseline is useful for quality testing. It is not a bro
 
 ## 4. Build a bounded training pilot
 
+The [v3 builder and training integration](experiments/2026-09-16-dataset-builder-v3/README.md) are implemented and tested offline. [Build configurations and commands](configs/README.md) cover the matched answer/passage comparison and a later mixed-source pilot. Production data inspection and retrieval evaluation remain pending.
+
+[Training data quality inspection](experiments/2026-09-16-training-data-quality/README.md) found that 92.8% of pilot rows use MSMARCO-XI answers rather than selected passages. Retain the current dataset as a control; a future data comparison should inspect selected passage supervision, translation quality, English retention, and negatives before scaling volume.
+
 - Inspect language-specific slices of Indic SWIM-IR and MSMARCO-XI for relevance training. Confirm terms, schema, and actual available examples.
 - Begin with a manageable subset. The earlier 100,000 to 300,000 example range is an experiment budget, not a required dataset size.
 - Retain native-script and English examples alongside controlled Romanized variants. Translation or word-transliteration pairs are auxiliary alignment data, not substitutes for relevance labels.
