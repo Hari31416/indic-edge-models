@@ -45,9 +45,9 @@ A Python transliteration baseline is useful for quality testing. It is not a bro
 
 ## 4. Build a bounded training pilot
 
-The [v3 builder and training integration](experiments/2026-09-16-dataset-builder-v3/README.md) are implemented and tested offline. [Build configurations and commands](configs/README.md) cover the matched answer/passage comparison and a later mixed-source pilot. Production data inspection and retrieval evaluation remain pending.
+The [quality-matched v3 dataset](experiments/2026-09-16-quality-matched-dataset/README.md) is generated (98,825 training and 5,227 validation rows per arm; exact 1:1 match across passage and answer arms). The [v3 builder and training integration](experiments/2026-09-16-dataset-builder-v3/README.md) are implemented and tested offline. Next: run the matched training comparison on Kaggle GPU under equal update budgets.
 
-[Training data quality inspection](experiments/2026-09-16-training-data-quality/README.md) found that 92.8% of pilot rows use MSMARCO-XI answers rather than selected passages. Retain the current dataset as a control; a future data comparison should inspect selected passage supervision, translation quality, English retention, and negatives before scaling volume.
+[Training data quality inspection](experiments/2026-09-16-training-data-quality/README.md) found that 92.8% of historical pilot rows used MSMARCO-XI answers rather than selected passages. The new matched control directly evaluates whether full selected passage supervision resolves this limitation.
 
 - Inspect language-specific slices of Indic SWIM-IR and MSMARCO-XI for relevance training. Confirm terms, schema, and actual available examples.
 - Begin with a manageable subset. The earlier 100,000 to 300,000 example range is an experiment budget, not a required dataset size.

@@ -17,7 +17,13 @@
       "split": "train",
       "max_queries": 80000,
       "romanized_probability": 0.3,
-      "files": [{"path": "/tmp/indic-data/hintrain.parquet"}]
+      "files": [
+        {
+          "repo_id": "ai4bharat/MSMARCO-XI",
+          "filename": "train/hintrain.parquet",
+          "revision": "bf5cdc1f26e581e519018e434db14edd1b77602b"
+        }
+      ]
     }
   ]
 }

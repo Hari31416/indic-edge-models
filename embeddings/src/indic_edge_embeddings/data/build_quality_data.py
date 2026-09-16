@@ -9,11 +9,13 @@ import argparse
 from collections import Counter, defaultdict
 import hashlib
 import json
+import logging
 from pathlib import Path
-import random
 import platform
-import subprocess
+import random
 import re
+import subprocess
+from typing import Any, Dict, Iterable, Iterator, List, Optional, Set, Tuple, Union
 import unicodedata
 
 import pyarrow as pa
@@ -21,16 +23,22 @@ import pyarrow.parquet as pq
 
 from .transliterate import transliterate_devanagari_to_roman, ROMANIZATION_VERSION
 
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
+)
+logger = logging.getLogger("build_quality_data")
 
-def normalize(text):
+
+def normalize(text: str) -> str:
     return " ".join(unicodedata.normalize("NFC", text).casefold().split())
 
 
-def digest(text):
+def digest(text: str) -> str:
     return hashlib.sha256(text.encode("utf-8")).hexdigest()
 
 
-def file_hash(path):
+def file_hash(path: Union[Path, str]) -> str:
     h = hashlib.sha256()
     with Path(path).open("rb") as f:
         for block in iter(lambda: f.read(1024 * 1024), b""):
@@ -38,7 +46,7 @@ def file_hash(path):
     return h.hexdigest()
 
 
-def text(value):
+def text(value: Any) -> str:
     if value is None:
         return ""
     if not isinstance(value, str):
@@ -46,7 +54,7 @@ def text(value):
     return " ".join(unicodedata.normalize("NFC", value).split())
 
 
-def informative(value):
+def informative(value: Optional[str]) -> bool:
     return bool(value) and normalize(value).strip(".। !") not in {
         "null",
         "none",
@@ -57,11 +65,11 @@ def informative(value):
     }
 
 
-def unique_texts(values):
+def unique_texts(values: Iterable[str]) -> List[str]:
     return list({normalize(v): v for v in values if informative(v)}.values())
 
 
-def read_rows(path):
+def read_rows(path: Union[Path, str]) -> Iterator[Dict[str, Any]]:
     if Path(path).suffix == ".parquet":
         for batch in pq.ParquetFile(path).iter_batches(batch_size=2048):
             yield from batch.to_pylist()
@@ -72,7 +80,7 @@ def read_rows(path):
                     yield json.loads(line)
 
 
-def resolve_input(spec, base):
+def resolve_input(spec: Dict[str, Any], base: Path) -> Tuple[Path, Dict[str, Any]]:
     if "path" in spec:
         path = (base / spec["path"]).resolve()
         provenance = {"path": str(path)}
@@ -97,7 +105,7 @@ def resolve_input(spec, base):
     return path, provenance
 
 
-def adapt(row, spec):
+def adapt(row: Dict[str, Any], spec: Dict[str, Any]) -> Optional[Dict[str, Any]]:
     """Return query-level supervision; preserve all known positive passages."""
     fmt = spec["format"]
     lang = spec.get("language", "hi")
@@ -105,7 +113,13 @@ def adapt(row, spec):
     if fmt == "swim":
         qid = str(row["_id"])
     elif fmt == "indic-rag":
-        qid = digest(str(row["wiki_id"]) + ":" + text(row["question"]) + ":" + text(row["paragraph"]))
+        qid = digest(
+            str(row["wiki_id"])
+            + ":"
+            + text(row["question"])
+            + ":"
+            + text(row["paragraph"])
+        )
     else:
         qid = str(row["query_id"])
     family = spec.get("family", spec["name"])
@@ -127,7 +141,7 @@ def adapt(row, spec):
     elif fmt == "miracl":
         query = text(row["query"])
 
-        def passage(p):
+        def passage(p: Dict[str, Any]) -> str:
             return text((p.get("title", "") + " " + p["text"]).strip())
 
         positives = [passage(p) for p in row["positive_passages"]]
@@ -172,7 +186,11 @@ def adapt(row, spec):
         language=lang,
         passage_language=doc_lang,
         english_query=english_query,
-        document_group=(f"wikipedia:{lang}:{row['wiki_id']}" if fmt == "indic-rag" else row.get("document_group", "")),
+        document_group=(
+            f"wikipedia:{lang}:{row['wiki_id']}"
+            if fmt == "indic-rag"
+            else row.get("document_group", "")
+        ),
         negative_provenance=(
             "human_judged"
             if fmt == "miracl"
@@ -181,7 +199,7 @@ def adapt(row, spec):
     )
 
 
-def load_lexicon(path):
+def load_lexicon(path: Union[Path, str]) -> Dict[str, Dict[str, int]]:
     """Dakshina TRAIN lexicon: native<TAB>roman<TAB>attestation count."""
     lexicon = defaultdict(Counter)
     with Path(path).open(encoding="utf-8") as f:
@@ -192,8 +210,12 @@ def load_lexicon(path):
     return dict(lexicon)
 
 
-def romanize(query, lexicon, rng):
-    def replace(match):
+def romanize(
+    query: str,
+    lexicon: Dict[str, Dict[str, int]],
+    rng: random.Random,
+) -> str:
+    def replace(match: re.Match) -> str:
         word = match.group()
         choices = lexicon.get(unicodedata.normalize("NFC", word))
         if choices:
@@ -204,11 +226,13 @@ def romanize(query, lexicon, rng):
     return transliterate_devanagari_to_roman(result)
 
 
-def group_records(records, include_answers=True):
+def group_records(
+    records: List[Dict[str, Any]], include_answers: bool = True
+) -> List[List[Dict[str, Any]]]:
     """Connected components across identities, queries and known positive texts."""
     parent = list(range(len(records)))
 
-    def find(x):
+    def find(x: int) -> int:
         while parent[x] != x:
             parent[x] = parent[parent[x]]
             x = parent[x]
@@ -236,7 +260,7 @@ def group_records(records, include_answers=True):
     return list(groups.values())
 
 
-def write_rows(path, rows):
+def write_rows(path: Path, rows: List[Dict[str, Any]]) -> None:
     with path.with_suffix(".jsonl").open("w", encoding="utf-8") as f:
         for row in rows:
             f.write(json.dumps(row, ensure_ascii=False) + "\n")
@@ -244,7 +268,11 @@ def write_rows(path, rows):
         pq.write_table(pa.Table.from_pylist(rows), path.with_suffix(".parquet"))
 
 
-def build(config, output_dir, base=Path(".")):
+def build(
+    config: Dict[str, Any],
+    output_dir: Union[Path, str],
+    base: Path = Path("."),
+) -> Dict[str, Any]:
     out = Path(output_dir)
     if out.exists() and any(out.iterdir()):
         raise FileExistsError(f"Use a new output directory: {out}")
@@ -255,13 +283,24 @@ def build(config, output_dir, base=Path(".")):
     validation_fraction = config.get("validation_fraction", 0.05)
     if not 0 < validation_fraction < 1:
         raise ValueError("validation_fraction must be between zero and one")
-    if not isinstance(config.get("max_negatives", 2), int) or config.get("max_negatives", 2) < 0:
+    if (
+        not isinstance(config.get("max_negatives", 2), int)
+        or config.get("max_negatives", 2) < 0
+    ):
         raise ValueError("max_negatives must be a nonnegative integer")
-    revision = subprocess.run(["git", "rev-parse", "HEAD"], capture_output=True, text=True)
-    report = {"status": "in_progress", "config": config, "inputs": [], "sources": {},
-              "python": platform.python_version(), "platform": platform.platform(),
-              "code_revision": revision.stdout.strip() if revision.returncode == 0 else None,
-              "builder_sha256": file_hash(__file__)}
+    revision = subprocess.run(
+        ["git", "rev-parse", "HEAD"], capture_output=True, text=True
+    )
+    report = {
+        "status": "in_progress",
+        "config": config,
+        "inputs": [],
+        "sources": {},
+        "python": platform.python_version(),
+        "platform": platform.platform(),
+        "code_revision": revision.stdout.strip() if revision.returncode == 0 else None,
+        "builder_sha256": file_hash(__file__),
+    }
     (out / "report.json").write_text(json.dumps(report, indent=2))
     excluded_queries, excluded_passages = set(), set()
     for item in config.get("exclude", []):
@@ -269,9 +308,13 @@ def build(config, output_dir, base=Path(".")):
         report["inputs"].append(provenance)
         for row in read_rows(path):
             if item.get("kind") == "queries":
-                excluded_queries.add(normalize(text(row.get("query", row.get("text", "")))))
+                excluded_queries.add(
+                    normalize(text(row.get("query", row.get("text", ""))))
+                )
             elif item.get("kind") == "passages":
-                for p in row.get("positives", [row.get("positive", row.get("text", ""))]):
+                for p in row.get(
+                    "positives", [row.get("positive", row.get("text", ""))]
+                ):
                     excluded_passages.add(normalize(text(p)))
             else:
                 raise ValueError("Exclusions must declare kind=queries or passages")
@@ -331,7 +374,10 @@ def build(config, output_dir, base=Path(".")):
                     or normalize(row["english_query"]) in excluded_queries
                 ):
                     reason = "evaluation_query_overlap"
-                elif any(normalize(p) in excluded_passages for p in row["positives"] + [row["answer"]]):
+                elif any(
+                    normalize(p) in excluded_passages
+                    for p in row["positives"] + [row["answer"]]
+                ):
                     reason = "evaluation_passage_overlap"
                 if reason:
                     if reason.startswith("evaluation_"):
@@ -343,19 +389,25 @@ def build(config, output_dir, base=Path(".")):
                         )
                     continue
                 key = (row["source_identity"], row["language"], row["passage_language"])
-                fingerprint = digest(json.dumps(row, ensure_ascii=False, sort_keys=True))
+                fingerprint = digest(
+                    json.dumps(row, ensure_ascii=False, sort_keys=True)
+                )
                 if key in seen:
                     if seen[key] == fingerprint:
                         stats["duplicate_rows"] += 1
                         continue
-                    raise ValueError(f"Conflicting query identity {key}; consolidate its positives before building")
+                    raise ValueError(
+                        f"Conflicting query identity {key}; consolidate its positives before building"
+                    )
                 seen[key] = fingerprint
                 stats["eligible"] += 1
                 if len(row["query"].split()) <= 2:
                     stats["review_short_query"] += 1
                 if any(len(p.split()) > 400 for p in row["positives"]):
                     stats["review_long_positive"] += 1
-                if row["language"] == "hi" and not re.search(r"[\u0900-\u097f]", row["query"]):
+                if row["language"] == "hi" and not re.search(
+                    r"[\u0900-\u097f]", row["query"]
+                ):
                     stats["review_hindi_query_without_devanagari"] += 1
                 j = source_rng.randrange(stats["eligible"])
                 if len(sampled) < cap:
@@ -372,7 +424,9 @@ def build(config, output_dir, base=Path(".")):
     conversion_failures = []
     for row in records:
         spec = source_options[row["source"]]
-        qid = digest(row["source"] + ":" + row["source_identity"] + ":" + row["language"])
+        qid = digest(
+            row["source"] + ":" + row["source_identity"] + ":" + row["language"]
+        )
         local_rng = random.Random(f"{seed}:{qid}")
         probability = spec.get("romanized_probability", 0)
         if not 0 <= probability <= 1:
@@ -389,7 +443,11 @@ def build(config, output_dir, base=Path(".")):
             blocked_identities.add(row["source_identity"])
     groups = group_records(records, include_answers=matched)
     before = len(records)
-    groups = [g for g in groups if not any(r["source_identity"] in blocked_identities for r in g)]
+    groups = [
+        g
+        for g in groups
+        if not any(r["source_identity"] in blocked_identities for r in g)
+    ]
     records = [r for g in groups for r in g]
     report["excluded_related_queries"] = before - len(records)
     rng.shuffle(groups)
@@ -403,7 +461,9 @@ def build(config, output_dir, base=Path(".")):
         if split == "validation":
             validation_count += len(group)
     if not splits["train"] or not splits["validation"]:
-        raise ValueError("Cannot form nonempty disjoint splits; inspect component sizes or increase input size")
+        raise ValueError(
+            "Cannot form nonempty disjoint splits; inspect component sizes or increase input size"
+        )
     outputs = {}
     for split, components in splits.items():
         passage_rows, answer_rows = [], []
@@ -502,7 +562,7 @@ def build(config, output_dir, base=Path(".")):
     return report
 
 
-def main():
+def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--config", required=True, type=Path)
     parser.add_argument("--output-dir", required=True, type=Path)
@@ -521,7 +581,7 @@ def main():
             report.update(status="failed", error=str(exc))
             path.write_text(json.dumps(report, indent=2))
         raise
-    print(json.dumps(report["outputs"], indent=2))
+    logger.info("Build outputs:\n%s", json.dumps(report["outputs"], indent=2))
 
 
 if __name__ == "__main__":
