@@ -1,0 +1,7 @@
+{
+  "command": "python -m indic_edge_embeddings.train.run_followup_campaign --train-file train.parquet --val-file validation.parquet --native-eval-dir miracl_hi_dev_native --romanized-eval-dir miracl_hi_dev_romanized --english-eval-dir scifact_en_test --native-baseline 0.551321 --english-baseline 0.677044 --learning-rate 5e-6 --num-epochs 1 --batch-size 32 --gradient-accumulation-steps 4 --checkpoints-per-epoch 1 --output-dir /kaggle/working/outputs/campaign",
+  "executed_command": "python -m indic_edge_embeddings.train.run_followup_campaign --train-file train.parquet --val-file validation.parquet --native-eval-dir miracl_hi_dev_native --romanized-eval-dir miracl_hi_dev_romanized --english-eval-dir scifact_en_test --native-baseline 0.551321 --english-baseline 0.677044 --learning-rate 5e-6 --num-epochs 1 --batch-size 32 --gradient-accumulation-steps 4 --checkpoints-per-epoch 1 --output-dir /kaggle/working/outputs/campaign",
+  "exit_code": 0,
+  "duration_seconds": 6897.484226942062,
+  "status": "SUCCESS"
+}

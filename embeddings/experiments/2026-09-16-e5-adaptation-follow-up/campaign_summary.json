@@ -1,0 +1,95 @@
+{
+  "total_duration_seconds": 6772.5510885715485,
+  "results": [
+    {
+      "experiment": "conservative_control",
+      "title": "Conservative Control (InfoNCE, LR 5e-6, 1 Epoch)",
+      "checkpoint": "final_model",
+      "checkpoint_path": "/kaggle/working/outputs/campaign/01_conservative_control/final_model",
+      "native_ndcg@10": 0.4366508138964132,
+      "native_recall@20": 0.63943537414966,
+      "roman_ndcg@10": 0.0635900891748936,
+      "roman_recall@20": 0.11872789115646261,
+      "english_ndcg@10": 0.6630649544994635,
+      "english_recall@20": 0.8528888888888889,
+      "decision": "REJECT (Native drop: -0.1147)",
+      "detailed_metrics": {
+        "native": {
+          "ndcg@10": 0.4366508138964132,
+          "recall@20": 0.63943537414966,
+          "mrr@10": 0.4749977324263037
+        },
+        "romanized": {
+          "ndcg@10": 0.0635900891748936,
+          "recall@20": 0.11872789115646261,
+          "mrr@10": 0.07291269841269842
+        },
+        "english": {
+          "ndcg@10": 0.6630649544994635,
+          "recall@20": 0.8528888888888889,
+          "mrr@10": 0.6259880952380952
+        }
+      }
+    },
+    {
+      "experiment": "teacher_align",
+      "title": "Teacher Alignment + Preservation (L_script + L_preserve)",
+      "checkpoint": "final_model",
+      "checkpoint_path": "/kaggle/working/outputs/campaign/02_teacher_alignment/final_model",
+      "native_ndcg@10": 0.5387060619912135,
+      "native_recall@20": 0.7671904761904763,
+      "roman_ndcg@10": 0.00589108924477423,
+      "roman_recall@20": 0.012619047619047617,
+      "english_ndcg@10": 0.6681414159933804,
+      "english_recall@20": 0.8433333333333334,
+      "decision": "PROGRESS (Preserved, Roman < 0.40)",
+      "detailed_metrics": {
+        "native": {
+          "ndcg@10": 0.5387060619912135,
+          "recall@20": 0.7671904761904763,
+          "mrr@10": 0.5697312925170069
+        },
+        "romanized": {
+          "ndcg@10": 0.00589108924477423,
+          "recall@20": 0.012619047619047617,
+          "mrr@10": 0.008380952380952381
+        },
+        "english": {
+          "ndcg@10": 0.6681414159933804,
+          "recall@20": 0.8433333333333334,
+          "mrr@10": 0.6364497354497353
+        }
+      }
+    },
+    {
+      "experiment": "dual_objective",
+      "title": "Dual-Objective (L_script + L_preserve + L_retrieval)",
+      "checkpoint": "final_model",
+      "checkpoint_path": "/kaggle/working/outputs/campaign/03_dual_objective/final_model",
+      "native_ndcg@10": 0.43418444730824773,
+      "native_recall@20": 0.6286054421768708,
+      "roman_ndcg@10": 0.050123067042267856,
+      "roman_recall@20": 0.09397052154195011,
+      "english_ndcg@10": 0.6571284948944028,
+      "english_recall@20": 0.8602222222222222,
+      "decision": "REJECT (Native drop: -0.1171)",
+      "detailed_metrics": {
+        "native": {
+          "ndcg@10": 0.43418444730824773,
+          "recall@20": 0.6286054421768708,
+          "mrr@10": 0.4757993197278911
+        },
+        "romanized": {
+          "ndcg@10": 0.050123067042267856,
+          "recall@20": 0.09397052154195011,
+          "mrr@10": 0.06270521541950114
+        },
+        "english": {
+          "ndcg@10": 0.6571284948944028,
+          "recall@20": 0.8602222222222222,
+          "mrr@10": 0.624579365079365
+        }
+      }
+    }
+  ]
+}
