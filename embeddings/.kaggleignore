@@ -1,0 +1,22 @@
+# Packaging ignore patterns for remote Kaggle runs
+data/
+data/**
+!src/indic_edge_embeddings/data
+experiments/**/outputs/
+experiments/**/best_model/
+experiments/**/*.log
+experiments/**/*.png
+outputs/
+**/outputs/
+**/best_model/
+.venv/
+.pytest_cache/
+.kagglex/
+artifacts/
+*.log
+**/*.log
+*.parquet
+*.pt
+*.bin
+*.safetensors
+*.onnx

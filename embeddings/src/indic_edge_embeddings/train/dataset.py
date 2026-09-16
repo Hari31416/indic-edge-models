@@ -26,10 +26,11 @@ def resolve_data_path(file_path: Union[str, Path]) -> Path:
     if path.exists():
         return path
 
-    filename = path.name
     kaggle_input = Path("/kaggle/input")
     if kaggle_input.exists():
-        matches = list(kaggle_input.glob(f"**/{filename}"))
+        matches = list(kaggle_input.glob(f"**/{file_path}"))
+        if not matches:
+            matches = list(kaggle_input.glob(f"**/{path.name}"))
         if matches:
             logger.info("Resolved data path %s to %s", str(file_path), str(matches[0]))
             return matches[0]

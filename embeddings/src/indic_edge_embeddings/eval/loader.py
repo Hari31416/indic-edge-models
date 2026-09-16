@@ -44,10 +44,11 @@ def resolve_manifest_path(manifest_path: Union[str, Path]) -> Path:
     if path.exists():
         return path
 
-    dirname = path.name
     kaggle_input = Path("/kaggle/input")
     if kaggle_input.exists():
-        matches = [m for m in kaggle_input.glob(f"**/{dirname}") if m.is_dir()]
+        matches = [m for m in kaggle_input.glob(f"**/{manifest_path}") if m.is_dir()]
+        if not matches:
+            matches = [m for m in kaggle_input.glob(f"**/{path.name}") if m.is_dir()]
         if matches:
             logger.info("Resolved manifest path %s to %s", str(manifest_path), str(matches[0]))
             return matches[0]

@@ -50,3 +50,5 @@ outputs/
 *.log
 dataset-metadata.json
 dataset_metadata.json
+
+.kagglex/

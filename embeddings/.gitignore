@@ -1,1 +1,26 @@
+# Data
+data/
+data/**
 !src/indic_edge_embeddings/data
+
+# Python / Environment / Caches
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+.kagglex/
+.kagglerun/
+artifacts/
+
+# Outputs, checkpoints, and logs
+outputs/
+**/outputs/
+**/best_model/
+*.log
+**/*.log
+*.onnx
+*.bin
+*.safetensors
+*.pt
+*.parquet
+dataset-metadata.json
