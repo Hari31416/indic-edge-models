@@ -10,7 +10,7 @@ import torch
 from tqdm import tqdm
 from transformers import AutoModel, AutoTokenizer
 
-from indic_edge_embeddings.eval.loader import EvaluationManifest
+from indic_edge_embeddings.eval.loader import EvaluationManifest, resolve_manifest_path
 from indic_edge_embeddings.eval.metrics import compute_retrieval_metrics
 
 logger = logging.getLogger(__name__)
@@ -66,7 +66,13 @@ class DenseRetrievalEvaluator:
             cache_dir: Directory to cache encoded corpus vectors.
             fp16: Enable float16 mixed precision on CUDA (default: True).
         """
-        self.model_name = model_name_or_path
+        model_path = Path(model_name_or_path)
+        if model_path.exists():
+            self.model_name = str(model_path.resolve())
+        else:
+            resolved = resolve_manifest_path(model_name_or_path)
+            self.model_name = str(resolved) if resolved.exists() else model_name_or_path
+
         self.query_prefix = query_prefix
         self.passage_prefix = passage_prefix
         self.pooling = pooling

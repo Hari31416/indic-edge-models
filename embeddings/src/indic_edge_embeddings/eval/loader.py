@@ -31,6 +31,30 @@ class Query:
     metadata: Dict[str, Union[str, int, float]] = field(default_factory=dict)
 
 
+def resolve_manifest_path(manifest_path: Union[str, Path]) -> Path:
+    """Resolve manifest directory path, searching recursively in /kaggle/input if on Kaggle.
+
+    Args:
+        manifest_path: Manifest directory path.
+
+    Returns:
+        Resolved Path object.
+    """
+    path = Path(manifest_path)
+    if path.exists():
+        return path
+
+    dirname = path.name
+    kaggle_input = Path("/kaggle/input")
+    if kaggle_input.exists():
+        matches = [m for m in kaggle_input.glob(f"**/{dirname}") if m.is_dir()]
+        if matches:
+            logger.info("Resolved manifest path %s to %s", str(manifest_path), str(matches[0]))
+            return matches[0]
+
+    return path
+
+
 @dataclass
 class EvaluationManifest:
     """Frozen evaluation dataset containing corpus, queries, and relevance judgments."""
@@ -101,7 +125,9 @@ class EvaluationManifest:
         Returns:
             Loaded EvaluationManifest object.
         """
-        dir_path = Path(manifest_dir)
+        dir_path = resolve_manifest_path(manifest_dir)
+        if not dir_path.exists():
+            raise FileNotFoundError(f"Manifest directory not found: {dir_path}")
         meta_file = dir_path / "metadata.json"
         with open(meta_file, "r", encoding="utf-8") as f:
             meta = json.load(f)

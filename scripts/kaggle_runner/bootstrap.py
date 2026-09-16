@@ -68,7 +68,18 @@ def print_environment_info() -> None:
                 log(f"  {line}")
     except Exception:
         pass
+
+    input_dir = Path("/kaggle/input")
+    if input_dir.exists():
+        log("Contents of /kaggle/input:")
+        for item in sorted(input_dir.glob("*")):
+            log(f"  {item.name}/")
+            if item.is_dir():
+                for sub in sorted(item.glob("*"))[:10]:
+                    log(f"    {sub.name}")
+
     log("=" * 60)
+
 
 
 def extract_package_and_install() -> None:
@@ -169,6 +180,7 @@ def main() -> int:
     os.environ.setdefault("TRANSFORMERS_CACHE", "/tmp/huggingface")
     os.environ.setdefault("HF_DATASETS_CACHE", "/tmp/huggingface")
     os.environ.setdefault("PYTHONUNBUFFERED", "1")
+    os.environ.setdefault("PYTORCH_CUDA_ALLOC_CONF", "expandable_segments:True")
 
     print_environment_info()
     extract_package_and_install()
