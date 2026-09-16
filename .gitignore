@@ -39,9 +39,14 @@ data/
 **/data/
 artifacts/
 **/artifacts/
+outputs/
+**/outputs/
 .kaggle_staging/
 *.onnx
 *.bin
 *.safetensors
 *.pt
 *.parquet
+*.log
+dataset-metadata.json
+dataset_metadata.json
