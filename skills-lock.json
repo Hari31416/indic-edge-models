@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "skills": {
+    "kagglex": {
+      "source": "hari31416/skills",
+      "sourceType": "github",
+      "skillPath": "kagglex/SKILL.md",
+      "computedHash": "0a7bf4f18faa69fcd8c61b5cad7ccbb2103d0f481318514a2a9d36544b4620f3"
+    }
+  }
+}
