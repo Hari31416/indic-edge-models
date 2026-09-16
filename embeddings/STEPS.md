@@ -1,6 +1,6 @@
 # Embedding project steps
 
-Status: 15 September 2026. [Romanization v2](experiments/2026-09-15-romanization-v2/README.md) is complete: conversion repaired, source/text leakage removed, data regenerated, and E5 rerun. Next: step 4, a bounded E5 pilot with explicit supervision and regression checks. Browser validation in step 3 remains incomplete.
+Status: 16 September 2026. [E5 pilot training](experiments/2026-09-15-e5-pilot-training/README.md) is complete: synthetic Romanized nDCG@10 improved from 0.0006 to 0.1059 (+176x), but native nDCG@10 regressed from 0.5513 to 0.3921 (-0.1592). Next: iterate on Step 4 with dual-objective training (distillation preservation loss + query alignment) before proceeding to Step 5 compression. Browser validation in step 3 remains incomplete.
 
 This sequence will change as results arrive. Complete the next useful experiment, record what it establishes, and revise the remaining steps. Later stages are conditional; a useful result does not require implementing every technique listed here.
 
