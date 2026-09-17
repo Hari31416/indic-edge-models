@@ -56,7 +56,6 @@ class RetrievalDataset(Dataset):
         if not self.file_path.exists():
             raise FileNotFoundError(f"Dataset file not found: {self.file_path}")
 
-
         self.records: List[Dict[str, Any]] = []
         self.native_map: Dict[str, str] = {}
         self._build_native_map()
@@ -113,7 +112,8 @@ class RetrievalDataset(Dataset):
                     "language": str(row.get("language", "hi")),
                     "script": script,
                     "source_query_id": sqid,
-                    "positive_texts": row.get("positive_texts") or [str(row.get("positive", ""))],
+                    "positive_texts": row.get("positive_texts")
+                    or [str(row.get("positive", ""))],
                     "split_group_id": row.get("split_group_id"),
                 }
                 self.records.append(rec)
@@ -137,7 +137,8 @@ class RetrievalDataset(Dataset):
                         "language": str(item.get("language", "hi")),
                         "script": script,
                         "source_query_id": sqid,
-                        "positive_texts": item.get("positive_texts") or [str(item.get("positive", ""))],
+                        "positive_texts": item.get("positive_texts")
+                        or [str(item.get("positive", ""))],
                         "split_group_id": item.get("split_group_id"),
                     }
                     self.records.append(rec)
@@ -294,9 +295,7 @@ class PairedRetrievalCollator:
         self.max_length = max_length
         self.english_preservation_texts = english_preservation_texts or []
 
-    def __call__(
-        self, batch: Sequence[Dict[str, Any]]
-    ) -> Dict[str, Any]:
+    def __call__(self, batch: Sequence[Dict[str, Any]]) -> Dict[str, Any]:
         """Tokenize batch into student queries, teacher native targets, and passages.
 
         Args:
@@ -305,7 +304,9 @@ class PairedRetrievalCollator:
         Returns:
             Dict containing batch encodings and index tensors.
         """
-        student_queries = [f"{self.query_prefix}{item['query']}".strip() for item in batch]
+        student_queries = [
+            f"{self.query_prefix}{item['query']}".strip() for item in batch
+        ]
         teacher_native_queries = [
             f"{self.query_prefix}{item.get('native_query', item['query'])}".strip()
             for item in batch

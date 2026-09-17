@@ -238,8 +238,12 @@ def run_campaign() -> None:
     logger.info("Loading evaluation manifests for 3-way assessment...")
     manifests: Dict[str, EvaluationManifest] = {
         "native": EvaluationManifest.load(resolve_manifest_path(args.native_eval_dir)),
-        "romanized": EvaluationManifest.load(resolve_manifest_path(args.romanized_eval_dir)),
-        "english": EvaluationManifest.load(resolve_manifest_path(args.english_eval_dir)),
+        "romanized": EvaluationManifest.load(
+            resolve_manifest_path(args.romanized_eval_dir)
+        ),
+        "english": EvaluationManifest.load(
+            resolve_manifest_path(args.english_eval_dir)
+        ),
     }
     logger.info(
         "Manifests loaded: Native (%d q), Romanized (%d q), English (%d q)",
@@ -431,7 +435,11 @@ def run_campaign() -> None:
                 else:
                     candidate_dirs = sorted(
                         list(exp_dir.glob("checkpoint-*")),
-                        key=lambda p: int(p.name.split("-")[1]) if p.name.split("-")[1].isdigit() else 0,
+                        key=lambda p: (
+                            int(p.name.split("-")[1])
+                            if p.name.split("-")[1].isdigit()
+                            else 0
+                        ),
                     )
                     if candidate_dirs:
                         checkpoints_to_eval.append(str(candidate_dirs[-1]))
@@ -439,15 +447,23 @@ def run_campaign() -> None:
             # Sorted intermediate checkpoints + best + final
             candidate_dirs = sorted(
                 list(exp_dir.glob("checkpoint-*")),
-                key=lambda p: int(p.name.split("-")[1]) if p.name.split("-")[1].isdigit() else 0,
+                key=lambda p: (
+                    int(p.name.split("-")[1]) if p.name.split("-")[1].isdigit() else 0
+                ),
             )
             for c in candidate_dirs:
                 checkpoints_to_eval.append(str(c))
             best_model_path = exp_dir / "best_model"
-            if best_model_path.exists() and str(best_model_path) not in checkpoints_to_eval:
+            if (
+                best_model_path.exists()
+                and str(best_model_path) not in checkpoints_to_eval
+            ):
                 checkpoints_to_eval.append(str(best_model_path))
             final_model_path = exp_dir / "final_model"
-            if final_model_path.exists() and str(final_model_path) not in checkpoints_to_eval:
+            if (
+                final_model_path.exists()
+                and str(final_model_path) not in checkpoints_to_eval
+            ):
                 checkpoints_to_eval.append(str(final_model_path))
 
         logger.info(
@@ -482,9 +498,13 @@ def run_campaign() -> None:
             else:
                 failed_gates = []
                 if not native_pass:
-                    failed_gates.append(f"Native drop: {native_ndcg - native_baseline:.4f}")
+                    failed_gates.append(
+                        f"Native drop: {native_ndcg - native_baseline:.4f}"
+                    )
                 if not english_pass:
-                    failed_gates.append(f"English drop: {en_ndcg - english_baseline:.4f}")
+                    failed_gates.append(
+                        f"English drop: {en_ndcg - english_baseline:.4f}"
+                    )
                 decision = f"REJECT ({', '.join(failed_gates)})"
 
             record = {
@@ -534,8 +554,12 @@ def run_campaign() -> None:
 
     md_lines.append("")
     md_lines.append("## Acceptance Criteria Reference")
-    md_lines.append(f"- Native Hindi baseline: {native_baseline:.4f} (Gate: >= {native_baseline - 0.02:.4f})")
-    md_lines.append(f"- English SciFact baseline: {english_baseline:.4f} (Gate: >= {english_baseline - 0.02:.4f})")
+    md_lines.append(
+        f"- Native Hindi baseline: {native_baseline:.4f} (Gate: >= {native_baseline - 0.02:.4f})"
+    )
+    md_lines.append(
+        f"- English SciFact baseline: {english_baseline:.4f} (Gate: >= {english_baseline - 0.02:.4f})"
+    )
     md_lines.append(f"- Romanized target: >= {roman_target:.4f}")
     md_lines.append("")
 

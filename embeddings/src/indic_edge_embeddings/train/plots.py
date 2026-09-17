@@ -128,9 +128,7 @@ def plot_retrieval_comparison(
     return out_file
 
 
-def format_markdown_table(
-    headers: Sequence[str], rows: Sequence[Sequence[Any]]
-) -> str:
+def format_markdown_table(headers: Sequence[str], rows: Sequence[Sequence[Any]]) -> str:
     """Format data rows as a markdown table with aligned columns."""
     col_widths = [len(h) for h in headers]
     str_rows = []
@@ -141,14 +139,10 @@ def format_markdown_table(
             col_widths[i] = max(col_widths[i], len(cell))
 
     header_line = (
-        "| "
-        + " | ".join(h.ljust(col_widths[i]) for i, h in enumerate(headers))
-        + " |"
+        "| " + " | ".join(h.ljust(col_widths[i]) for i, h in enumerate(headers)) + " |"
     )
     separator_line = (
-        "| "
-        + " | ".join("-" * col_widths[i] for i in range(len(headers)))
-        + " |"
+        "| " + " | ".join("-" * col_widths[i] for i in range(len(headers))) + " |"
     )
     data_lines = [
         "| "
@@ -157,4 +151,3 @@ def format_markdown_table(
         for row in str_rows
     ]
     return header_line + "\n" + separator_line + "\n" + "\n".join(data_lines)
-

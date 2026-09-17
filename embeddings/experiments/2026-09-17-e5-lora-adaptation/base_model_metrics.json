@@ -1,0 +1,30 @@
+{
+  "experiment": "base_model",
+  "title": "Base Model Reference (intfloat/multilingual-e5-small)",
+  "checkpoint": "pretrained_base",
+  "checkpoint_path": "intfloat/multilingual-e5-small",
+  "native_ndcg@10": 0.9189105720683878,
+  "native_recall@20": 0.9855850340136054,
+  "roman_ndcg@10": 0.015150647137138686,
+  "roman_recall@20": 0.04677777777777778,
+  "english_ndcg@10": 0.6770437713033434,
+  "english_recall@20": 0.8468888888888889,
+  "decision": "REFERENCE BASELINE",
+  "detailed_metrics": {
+    "native": {
+      "ndcg@10": 0.9189105720683878,
+      "recall@20": 0.9855850340136054,
+      "mrr@10": 0.9194829931972788
+    },
+    "romanized": {
+      "ndcg@10": 0.015150647137138686,
+      "recall@20": 0.04677777777777778,
+      "mrr@10": 0.01567800453514739
+    },
+    "english": {
+      "ndcg@10": 0.6770437713033434,
+      "recall@20": 0.8468888888888889,
+      "mrr@10": 0.6452169312169311
+    }
+  }
+}

@@ -62,16 +62,29 @@ class InfoNCELoss(nn.Module):
 
         if positive_mask is not None:
             positive_mask = positive_mask.to(similarity.device, dtype=torch.bool)
-            valid_mask = (torch.ones_like(positive_mask) if valid_mask is None
-                          else valid_mask.to(similarity.device, dtype=torch.bool))
-            if positive_mask.shape != similarity.shape or valid_mask.shape != similarity.shape:
+            valid_mask = (
+                torch.ones_like(positive_mask)
+                if valid_mask is None
+                else valid_mask.to(similarity.device, dtype=torch.bool)
+            )
+            if (
+                positive_mask.shape != similarity.shape
+                or valid_mask.shape != similarity.shape
+            ):
                 raise ValueError("Retrieval masks must match query/candidate scores")
-            if not positive_mask.any(dim=1).all() or (positive_mask & ~valid_mask).any():
+            if (
+                not positive_mask.any(dim=1).all()
+                or (positive_mask & ~valid_mask).any()
+            ):
                 raise ValueError("Every query needs at least one valid positive")
             # Float32 logsumexp avoids fp16 overflow in multi-positive reductions.
             scores = similarity.float()
-            numerator = scores.masked_fill(~positive_mask, float("-inf")).logsumexp(dim=1)
-            denominator = scores.masked_fill(~valid_mask, float("-inf")).logsumexp(dim=1)
+            numerator = scores.masked_fill(~positive_mask, float("-inf")).logsumexp(
+                dim=1
+            )
+            denominator = scores.masked_fill(~valid_mask, float("-inf")).logsumexp(
+                dim=1
+            )
             return (denominator - numerator).mean()
 
         # Targets are diagonal indices (0, 1, ..., batch_size - 1)
@@ -102,9 +115,13 @@ class ScriptAlignmentLoss(nn.Module):
             Scalar loss tensor.
         """
         if student_roman_embeddings.numel() == 0:
-            return torch.tensor(0.0, device=student_roman_embeddings.device, requires_grad=True)
+            return torch.tensor(
+                0.0, device=student_roman_embeddings.device, requires_grad=True
+            )
 
-        cos_sim = torch.sum(student_roman_embeddings * teacher_native_embeddings, dim=-1)
+        cos_sim = torch.sum(
+            student_roman_embeddings * teacher_native_embeddings, dim=-1
+        )
         return torch.mean(1.0 - cos_sim)
 
 
@@ -179,8 +196,14 @@ class DualObjectiveLoss(nn.Module):
         Returns:
             Tuple of (total_loss, metrics_dict).
         """
-        device = student_roman_emb.device if student_roman_emb.numel() > 0 else (
-            preservation_groups[0][0].device if preservation_groups else torch.device("cpu")
+        device = (
+            student_roman_emb.device
+            if student_roman_emb.numel() > 0
+            else (
+                preservation_groups[0][0].device
+                if preservation_groups
+                else torch.device("cpu")
+            )
         )
         total_loss = torch.tensor(0.0, device=device)
         metrics: dict[str, float] = {}
@@ -205,7 +228,9 @@ class DualObjectiveLoss(nn.Module):
             and student_passage_emb is not None
             and student_query_emb.numel() > 0
         ):
-            l_retrieval = self.retrieval_loss_fn(student_query_emb, student_passage_emb, positive_mask, valid_mask)
+            l_retrieval = self.retrieval_loss_fn(
+                student_query_emb, student_passage_emb, positive_mask, valid_mask
+            )
             total_loss = total_loss + self.weight_retrieval * l_retrieval
             metrics["loss_retrieval"] = l_retrieval.item()
         else:

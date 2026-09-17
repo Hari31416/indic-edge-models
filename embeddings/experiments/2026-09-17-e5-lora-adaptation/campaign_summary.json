@@ -1,0 +1,409 @@
+{
+  "total_duration_seconds": 1579.300772190094,
+  "results": [
+    {
+      "experiment": "base_model",
+      "title": "Base Model Reference (intfloat/multilingual-e5-small)",
+      "checkpoint": "pretrained_base",
+      "checkpoint_path": "intfloat/multilingual-e5-small",
+      "native_ndcg@10": 0.9189105720683878,
+      "native_recall@20": 0.9855850340136054,
+      "roman_ndcg@10": 0.015150647137138686,
+      "roman_recall@20": 0.04677777777777778,
+      "english_ndcg@10": 0.6770437713033434,
+      "english_recall@20": 0.8468888888888889,
+      "decision": "REFERENCE BASELINE",
+      "detailed_metrics": {
+        "native": {
+          "ndcg@10": 0.9189105720683878,
+          "recall@20": 0.9855850340136054,
+          "mrr@10": 0.9194829931972788
+        },
+        "romanized": {
+          "ndcg@10": 0.015150647137138686,
+          "recall@20": 0.04677777777777778,
+          "mrr@10": 0.01567800453514739
+        },
+        "english": {
+          "ndcg@10": 0.6770437713033434,
+          "recall@20": 0.8468888888888889,
+          "mrr@10": 0.6452169312169311
+        }
+      }
+    },
+    {
+      "experiment": "lora_symmetric",
+      "title": "LoRA Symmetric (r=16, alpha=32, LR 0.0001)",
+      "checkpoint": "final_model",
+      "checkpoint_path": "/kaggle/working/outputs/campaign_lora/01_lora_symmetric/final_model",
+      "native_ndcg@10": 0.8691671501994249,
+      "native_recall@20": 0.972843537414966,
+      "roman_ndcg@10": 0.34143228982099777,
+      "roman_recall@20": 0.4782244897959182,
+      "english_ndcg@10": 0.6570928174693753,
+      "english_recall@20": 0.8468888888888889,
+      "decision": "REJECT (Native drop: -0.0497)",
+      "detailed_metrics": {
+        "native": {
+          "ndcg@10": 0.8691671501994249,
+          "recall@20": 0.972843537414966,
+          "mrr@10": 0.8733208616780045
+        },
+        "romanized": {
+          "ndcg@10": 0.34143228982099777,
+          "recall@20": 0.4782244897959182,
+          "mrr@10": 0.3636439909297051
+        },
+        "english": {
+          "ndcg@10": 0.6570928174693753,
+          "recall@20": 0.8468888888888889,
+          "mrr@10": 0.6215304232804233
+        }
+      },
+      "training_summary": {
+        "config": {
+          "model_name_or_path": "intfloat/multilingual-e5-small",
+          "output_dir": "/kaggle/working/outputs/campaign_lora/01_lora_symmetric",
+          "query_prefix": "query: ",
+          "passage_prefix": "passage: ",
+          "max_length": 512,
+          "batch_size": 32,
+          "gradient_accumulation_steps": 4,
+          "learning_rate": 0.0001,
+          "weight_decay": 0.01,
+          "num_epochs": 1,
+          "warmup_ratio": 0.1,
+          "temperature": 0.05,
+          "fp16": true,
+          "seed": 42,
+          "logging_steps": 50,
+          "eval_steps": 250,
+          "checkpoints_per_epoch": 1,
+          "save_steps": null,
+          "lora_r": 16,
+          "lora_alpha": 32,
+          "lora_dropout": 0.05,
+          "lora_target_modules": [
+            "query",
+            "key",
+            "value",
+            "dense"
+          ],
+          "architecture_mode": "lora_symmetric"
+        },
+        "trainable_parameters": 1339392,
+        "total_parameters": 118993152,
+        "trainable_percent": 1.125604270067575,
+        "total_time_seconds": 988.5010788440704,
+        "throughput_examples_per_sec": 99.97460004349576,
+        "global_steps": 772,
+        "best_eval_loss": 0.3502652730207845,
+        "saved_checkpoints": [
+          "/kaggle/working/outputs/campaign_lora/01_lora_symmetric/checkpoint-772",
+          "/kaggle/working/outputs/campaign_lora/01_lora_symmetric/final_model"
+        ],
+        "train_logs": [
+          {
+            "step": 50,
+            "epoch": 1,
+            "train_loss": 3.4231611490249634,
+            "lr": 6.493506493506494e-05
+          },
+          {
+            "step": 100,
+            "epoch": 1,
+            "train_loss": 1.9582574367523193,
+            "lr": 9.973001813649882e-05
+          },
+          {
+            "step": 150,
+            "epoch": 1,
+            "train_loss": 2.105549782514572,
+            "lr": 9.730243739368006e-05
+          },
+          {
+            "step": 200,
+            "epoch": 1,
+            "train_loss": 2.3844194412231445,
+            "lr": 9.246880942156979e-05
+          },
+          {
+            "step": 250,
+            "epoch": 1,
+            "train_loss": 1.8497246503829956,
+            "lr": 8.547499760122235e-05
+          },
+          {
+            "step": 300,
+            "epoch": 1,
+            "train_loss": 1.4493411928415298,
+            "lr": 7.667674346478089e-05
+          },
+          {
+            "step": 350,
+            "epoch": 1,
+            "train_loss": 1.8029843270778656,
+            "lr": 6.65215718366304e-05
+          },
+          {
+            "step": 400,
+            "epoch": 1,
+            "train_loss": 1.6872846484184265,
+            "lr": 5.5526027400410266e-05
+          },
+          {
+            "step": 450,
+            "epoch": 1,
+            "train_loss": 0.8746937364339828,
+            "lr": 4.424940055811687e-05
+          },
+          {
+            "step": 500,
+            "epoch": 1,
+            "train_loss": 2.4089279174804688,
+            "lr": 3.326527902033356e-05
+          },
+          {
+            "step": 550,
+            "epoch": 1,
+            "train_loss": 1.4185770899057388,
+            "lr": 2.3132372161214394e-05
+          },
+          {
+            "step": 600,
+            "epoch": 1,
+            "train_loss": 1.897292673587799,
+            "lr": 1.4366092162802908e-05
+          },
+          {
+            "step": 650,
+            "epoch": 1,
+            "train_loss": 1.5485905855894089,
+            "lr": 7.412337479037718e-06
+          },
+          {
+            "step": 700,
+            "epoch": 1,
+            "train_loss": 2.121818482875824,
+            "lr": 2.6248121283989015e-06
+          },
+          {
+            "step": 750,
+            "epoch": 1,
+            "train_loss": 1.535661518573761,
+            "lr": 2.470344735703678e-07
+          }
+        ],
+        "eval_logs": [
+          {
+            "step": 250,
+            "epoch": 1,
+            "eval_loss": 0.39746143595633526
+          },
+          {
+            "step": 500,
+            "epoch": 1,
+            "eval_loss": 0.3585674281419459
+          },
+          {
+            "step": 750,
+            "epoch": 1,
+            "eval_loss": 0.3502656714195704
+          },
+          {
+            "step": 772,
+            "epoch": 1,
+            "eval_loss": 0.3502652730207845
+          }
+        ]
+      }
+    },
+    {
+      "experiment": "lora_query_asymmetric",
+      "title": "LoRA Query-Asymmetric (r=16, alpha=32, LR 0.0001)",
+      "checkpoint": "final_model",
+      "checkpoint_path": "/kaggle/working/outputs/campaign_lora/02_lora_query_asymmetric/final_model",
+      "native_ndcg@10": 0.8800753534243221,
+      "native_recall@20": 0.9778027210884354,
+      "roman_ndcg@10": 0.2800488723893817,
+      "roman_recall@20": 0.4315532879818594,
+      "english_ndcg@10": 0.6131299868865828,
+      "english_recall@20": 0.8028888888888889,
+      "decision": "REJECT (Native drop: -0.0388, English drop: -0.0639)",
+      "detailed_metrics": {
+        "native": {
+          "ndcg@10": 0.8800753534243221,
+          "recall@20": 0.9778027210884354,
+          "mrr@10": 0.8805147392290249
+        },
+        "romanized": {
+          "ndcg@10": 0.2800488723893817,
+          "recall@20": 0.4315532879818594,
+          "mrr@10": 0.28800000000000003
+        },
+        "english": {
+          "ndcg@10": 0.6131299868865828,
+          "recall@20": 0.8028888888888889,
+          "mrr@10": 0.5751322751322752
+        }
+      },
+      "training_summary": {
+        "config": {
+          "model_name_or_path": "intfloat/multilingual-e5-small",
+          "output_dir": "/kaggle/working/outputs/campaign_lora/02_lora_query_asymmetric",
+          "query_prefix": "query: ",
+          "passage_prefix": "passage: ",
+          "max_length": 512,
+          "batch_size": 32,
+          "gradient_accumulation_steps": 4,
+          "learning_rate": 0.0001,
+          "weight_decay": 0.01,
+          "num_epochs": 1,
+          "warmup_ratio": 0.1,
+          "temperature": 0.05,
+          "fp16": true,
+          "seed": 42,
+          "logging_steps": 50,
+          "eval_steps": 250,
+          "checkpoints_per_epoch": 1,
+          "save_steps": null,
+          "lora_r": 16,
+          "lora_alpha": 32,
+          "lora_dropout": 0.05,
+          "lora_target_modules": [
+            "query",
+            "key",
+            "value",
+            "dense"
+          ],
+          "architecture_mode": "lora_query_asymmetric"
+        },
+        "trainable_parameters": 1339392,
+        "total_parameters": 118993152,
+        "trainable_percent": 1.125604270067575,
+        "total_time_seconds": 542.324456691742,
+        "throughput_examples_per_sec": 182.22486332784413,
+        "global_steps": 772,
+        "best_eval_loss": 0.6512744119617997,
+        "saved_checkpoints": [
+          "/kaggle/working/outputs/campaign_lora/02_lora_query_asymmetric/checkpoint-772",
+          "/kaggle/working/outputs/campaign_lora/02_lora_query_asymmetric/final_model"
+        ],
+        "train_logs": [
+          {
+            "step": 50,
+            "epoch": 1,
+            "train_loss": 4.729501366615295,
+            "lr": 6.493506493506494e-05
+          },
+          {
+            "step": 100,
+            "epoch": 1,
+            "train_loss": 3.374680459499359,
+            "lr": 9.973001813649882e-05
+          },
+          {
+            "step": 150,
+            "epoch": 1,
+            "train_loss": 3.4149876832962036,
+            "lr": 9.730243739368006e-05
+          },
+          {
+            "step": 200,
+            "epoch": 1,
+            "train_loss": 3.896454095840454,
+            "lr": 9.246880942156979e-05
+          },
+          {
+            "step": 250,
+            "epoch": 1,
+            "train_loss": 3.320371687412262,
+            "lr": 8.547499760122235e-05
+          },
+          {
+            "step": 300,
+            "epoch": 1,
+            "train_loss": 3.203849196434021,
+            "lr": 7.667674346478089e-05
+          },
+          {
+            "step": 350,
+            "epoch": 1,
+            "train_loss": 3.2623162865638733,
+            "lr": 6.65215718366304e-05
+          },
+          {
+            "step": 400,
+            "epoch": 1,
+            "train_loss": 3.0088910460472107,
+            "lr": 5.5526027400410266e-05
+          },
+          {
+            "step": 450,
+            "epoch": 1,
+            "train_loss": 2.1952805519104004,
+            "lr": 4.424940055811687e-05
+          },
+          {
+            "step": 500,
+            "epoch": 1,
+            "train_loss": 3.316262423992157,
+            "lr": 3.326527902033356e-05
+          },
+          {
+            "step": 550,
+            "epoch": 1,
+            "train_loss": 2.561493754386902,
+            "lr": 2.3132372161214394e-05
+          },
+          {
+            "step": 600,
+            "epoch": 1,
+            "train_loss": 3.4472784996032715,
+            "lr": 1.4366092162802908e-05
+          },
+          {
+            "step": 650,
+            "epoch": 1,
+            "train_loss": 2.853002965450287,
+            "lr": 7.412337479037718e-06
+          },
+          {
+            "step": 700,
+            "epoch": 1,
+            "train_loss": 3.161038815975189,
+            "lr": 2.6248121283989015e-06
+          },
+          {
+            "step": 750,
+            "epoch": 1,
+            "train_loss": 2.6396446228027344,
+            "lr": 2.470344735703678e-07
+          }
+        ],
+        "eval_logs": [
+          {
+            "step": 250,
+            "epoch": 1,
+            "eval_loss": 0.7089912998603611
+          },
+          {
+            "step": 500,
+            "epoch": 1,
+            "eval_loss": 0.6595278156966697
+          },
+          {
+            "step": 750,
+            "epoch": 1,
+            "eval_loss": 0.6513016410171986
+          },
+          {
+            "step": 772,
+            "epoch": 1,
+            "eval_loss": 0.6512744119617997
+          }
+        ]
+      }
+    }
+  ]
+}

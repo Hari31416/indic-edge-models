@@ -1,6 +1,6 @@
 # Embedding project steps
 
-Status: 16 September 2026. [E5 adaptation follow-up](experiments/2026-09-16-e5-adaptation-follow-up/README.md) is complete: teacher preservation successfully protected native Hindi retrieval (0.5387 vs 0.5513 base) and English (0.6681 vs 0.6770 base), but unregularized/equal-weight InfoNCE caused severe native drift (0.4342 - 0.4367). Next: calibrate retrieval loss weighting or freeze document encoder. Compression remains deferred; browser validation in Step 3 remains incomplete.
+Status: 17 September 2026. [LoRA adaptation](experiments/2026-09-17-e5-lora-adaptation/README.md) is complete: parameter-isolated LoRA symmetric ($r=16, \alpha=32$) achieved 0.3414 Romanized nDCG@10 (22.5x gain over baseline) and 0.6571 English nDCG@10 with a modest -0.0497 native drop (0.8692 nDCG@10, 0.9728 Recall@20). Selected `LoRA Symmetric` as the adaptation model for deployment. Next: Step 5 compression and ONNX browser export/quantization.
 
 This sequence will change as results arrive. Complete the next useful experiment, record what it establishes, and revise the remaining steps. Later stages are conditional; a useful result does not require implementing every technique listed here.
 

@@ -159,7 +159,9 @@ class RetrievalTrainer:
                 english_preservation_texts=config.english_preservation_texts,
             )
             # Load frozen teacher model
-            teacher_path = config.teacher_model_name_or_path or config.model_name_or_path
+            teacher_path = (
+                config.teacher_model_name_or_path or config.model_name_or_path
+            )
             logger.info("Loading frozen teacher model from %s...", teacher_path)
             self.teacher_model = AutoModel.from_pretrained(
                 teacher_path, trust_remote_code=True
@@ -219,7 +221,11 @@ class RetrievalTrainer:
                 "python": random.getstate(),
                 "numpy": np.random.get_state(),
                 "torch": torch.get_rng_state(),
-                "cuda": torch.cuda.get_rng_state_all() if torch.cuda.is_available() else None,
+                "cuda": (
+                    torch.cuda.get_rng_state_all()
+                    if torch.cuda.is_available()
+                    else None
+                ),
             },
         }
         torch.save(state, target / "training_state.pt")
@@ -256,7 +262,9 @@ class RetrievalTrainer:
             raise FileNotFoundError(f"Training state not found at {state_file}")
 
         logger.info("Restoring model weights from %s...", str(target))
-        self.model = AutoModel.from_pretrained(target, trust_remote_code=True).to(self.device)
+        self.model = AutoModel.from_pretrained(target, trust_remote_code=True).to(
+            self.device
+        )
         self.model.train()
 
         logger.info("Restoring training state from %s...", str(state_file))
@@ -279,7 +287,9 @@ class RetrievalTrainer:
         step = int(state.get("step", 0))
         epoch = int(state.get("epoch", 0))
         batch_in_epoch = int(state.get("batch_in_epoch", 0))
-        logger.info("Resumed from step %d, epoch %d, batch %d", step, epoch, batch_in_epoch)
+        logger.info(
+            "Resumed from step %d, epoch %d, batch %d", step, epoch, batch_in_epoch
+        )
         return step, epoch, batch_in_epoch
 
     def evaluate(
@@ -313,11 +323,23 @@ class RetrievalTrainer:
                     q_emb = self._encode_batch(batch["queries"])
                     p_emb = self._encode_batch(batch["passages"])
                     if self.loss_fn is not None:
-                        loss = self.loss_fn(q_emb, p_emb, batch.get("positive_mask"), batch.get("valid_mask"))
+                        loss = self.loss_fn(
+                            q_emb,
+                            p_emb,
+                            batch.get("positive_mask"),
+                            batch.get("valid_mask"),
+                        )
                     else:
                         # For teacher alignment / dual loss, evaluation uses retrieval loss
-                        eval_retrieval_fn = InfoNCELoss(temperature=self.config.temperature)
-                        loss = eval_retrieval_fn(q_emb, p_emb, batch.get("positive_mask"), batch.get("valid_mask"))
+                        eval_retrieval_fn = InfoNCELoss(
+                            temperature=self.config.temperature
+                        )
+                        loss = eval_retrieval_fn(
+                            q_emb,
+                            p_emb,
+                            batch.get("positive_mask"),
+                            batch.get("valid_mask"),
+                        )
 
                 total_loss += loss.item()
                 total_batches += 1
@@ -427,7 +449,12 @@ class RetrievalTrainer:
                     p_emb = self._encode_batch(batch["passages"])
 
                     if self.loss_type == "infonce":
-                        loss = self.loss_fn(q_emb, p_emb, batch.get("positive_mask"), batch.get("valid_mask"))
+                        loss = self.loss_fn(
+                            q_emb,
+                            p_emb,
+                            batch.get("positive_mask"),
+                            batch.get("valid_mask"),
+                        )
                         last_metrics = {"loss": loss.item()}
                     else:
                         # Teacher distillation pass
@@ -460,11 +487,15 @@ class RetrievalTrainer:
                             t_native = t_q_emb[roman_idx]
                         else:
                             s_roman = torch.empty(0, q_emb.shape[1], device=self.device)
-                            t_native = torch.empty(0, t_q_emb.shape[1], device=self.device)
+                            t_native = torch.empty(
+                                0, t_q_emb.shape[1], device=self.device
+                            )
 
                         preservation_groups = []
                         if native_idx.numel() > 0:
-                            preservation_groups.append((q_emb[native_idx], t_q_emb[native_idx]))
+                            preservation_groups.append(
+                                (q_emb[native_idx], t_q_emb[native_idx])
+                            )
                         preservation_groups.append((p_emb, t_p_emb))
                         if s_en_emb is not None and t_en_emb is not None:
                             preservation_groups.append((s_en_emb, t_en_emb))
@@ -479,10 +510,16 @@ class RetrievalTrainer:
                             valid_mask=batch.get("valid_mask"),
                         )
 
-                    loss = loss / self.config.gradient_accumulation_steps
+                window_start = (
+                    step // self.config.gradient_accumulation_steps
+                ) * self.config.gradient_accumulation_steps
+                window_size = min(
+                    self.config.gradient_accumulation_steps,
+                    len(train_dataloader) - window_start,
+                )
 
-                scaler.scale(loss).backward()
-                accum_loss += loss.item() * self.config.gradient_accumulation_steps
+                scaler.scale(loss / window_size).backward()
+                accum_loss += loss.item()
 
                 if (step + 1) % self.config.gradient_accumulation_steps == 0 or (
                     step + 1 == len(train_dataloader)
@@ -566,9 +603,7 @@ class RetrievalTrainer:
             if self.eval_dataset is not None:
                 eval_metrics = self.evaluate()
                 eval_loss = eval_metrics.get("eval_loss", float("inf"))
-                logger.info(
-                    "End of Epoch %d Eval Loss: %.4f", epoch + 1, eval_loss
-                )
+                logger.info("End of Epoch %d Eval Loss: %.4f", epoch + 1, eval_loss)
                 eval_logs.append(
                     {
                         "step": global_step,
@@ -598,9 +633,7 @@ class RetrievalTrainer:
 
         # Generate plots and summary tables
         try:
-            plot_loss_curves(
-                train_logs, eval_logs, self.output_dir / "loss_curve.png"
-            )
+            plot_loss_curves(train_logs, eval_logs, self.output_dir / "loss_curve.png")
         except Exception as e:
             logger.warning("Failed to generate loss curve plot: %s", e)
 
@@ -610,19 +643,32 @@ class RetrievalTrainer:
             ["Base Model", self.config.model_name_or_path],
             ["Loss Type", self.config.loss_type],
             ["Training Examples", str(len(self.train_dataset))],
-            ["Validation Examples", str(len(self.eval_dataset)) if self.eval_dataset else "N/A"],
+            [
+                "Validation Examples",
+                str(len(self.eval_dataset)) if self.eval_dataset else "N/A",
+            ],
             ["Epochs", str(self.config.num_epochs)],
             ["Per-Device Batch Size", str(self.config.batch_size)],
             ["Gradient Accumulation", str(self.config.gradient_accumulation_steps)],
-            ["Effective Batch Size", str(self.config.batch_size * self.config.gradient_accumulation_steps)],
+            [
+                "Effective Batch Size",
+                str(self.config.batch_size * self.config.gradient_accumulation_steps),
+            ],
             ["Learning Rate", f"{self.config.learning_rate:.2e}"],
             ["Total Optimization Steps", str(global_step)],
             ["Saved Checkpoints", str(len(saved_checkpoints))],
             ["Training Duration (s)", f"{total_time:.2f}"],
             ["Throughput (examples/s)", f"{throughput:.1f}"],
-            ["Best Validation Loss", f"{best_eval_loss:.4f}" if best_eval_loss < float("inf") else "N/A"],
+            [
+                "Best Validation Loss",
+                f"{best_eval_loss:.4f}" if best_eval_loss < float("inf") else "N/A",
+            ],
         ]
-        report_md = "# Training Summary Report\n\n" + format_markdown_table(headers, rows) + "\n"
+        report_md = (
+            "# Training Summary Report\n\n"
+            + format_markdown_table(headers, rows)
+            + "\n"
+        )
         with open(self.output_dir / "training_report.md", "w", encoding="utf-8") as f:
             f.write(report_md)
 

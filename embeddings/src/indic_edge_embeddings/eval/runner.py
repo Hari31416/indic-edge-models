@@ -200,6 +200,32 @@ class DenseRetrievalEvaluator:
             return stacked[revert_indices]
         return stacked
 
+    def _compute_cache_key(
+        self, manifest: EvaluationManifest, doc_ids: List[str]
+    ) -> str:
+        """Compute unique cache hash reflecting model weights, manifest identity, and parameters."""
+        model_path = Path(self.model_name)
+        model_sig = self.model_name
+        if model_path.exists():
+            weight_files = sorted(
+                list(model_path.glob("*.safetensors")) + list(model_path.glob("*.bin"))
+            )
+            if weight_files:
+                sig_parts = [
+                    f"{wf.name}:{wf.stat().st_mtime}:{wf.stat().st_size}"
+                    for wf in weight_files
+                ]
+                model_sig = f"{model_path.resolve()}_{'-'.join(sig_parts)}"
+            else:
+                model_sig = f"{model_path.resolve()}_{model_path.stat().st_mtime}"
+
+        sample_docs = f"{doc_ids[0] if doc_ids else ''}:{doc_ids[-1] if doc_ids else ''}:{len(doc_ids)}"
+        payload = (
+            f"{model_sig}_{manifest.name}_{sample_docs}_{self.passage_prefix}_"
+            f"{self.max_length}_{self.pooling}_{self.normalize}"
+        )
+        return hashlib.sha256(payload.encode("utf-8")).hexdigest()[:16]
+
     def evaluate(
         self,
         manifest: EvaluationManifest,
@@ -224,12 +250,8 @@ class DenseRetrievalEvaluator:
         cache_file: Optional[Path] = None
         if self.cache_dir:
             self.cache_dir.mkdir(parents=True, exist_ok=True)
-            model_hash = hashlib.md5(
-                f"{self.model_name}_{self.passage_prefix}_{len(doc_texts)}_{self.max_length}".encode(
-                    "utf-8"
-                )
-            ).hexdigest()[:10]
-            cache_file = self.cache_dir / f"corpus_emb_{model_hash}.npy"
+            cache_hash = self._compute_cache_key(manifest, doc_ids)
+            cache_file = self.cache_dir / f"corpus_emb_{cache_hash}.npy"
             if cache_file.exists():
                 logger.info("Loading cached corpus embeddings from %s", str(cache_file))
                 doc_embeddings = np.load(cache_file)

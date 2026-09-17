@@ -35,7 +35,9 @@ def build_scifact_manifest(
     try:
         from datasets import load_dataset
     except ImportError:
-        logger.error("Hugging Face `datasets` package is required to build English manifest")
+        logger.error(
+            "Hugging Face `datasets` package is required to build English manifest"
+        )
         raise
 
     logger.info("Loading mteb/scifact split '%s'...", split)
@@ -92,7 +94,11 @@ def build_scifact_manifest(
     # Quality check: ensure all qrel queries exist in queries_map
     missing_queries = needed_qids - set(queries_map.keys())
     if missing_queries:
-        logger.warning("Found %d queries in qrels missing from queries table: %s", len(missing_queries), missing_queries)
+        logger.warning(
+            "Found %d queries in qrels missing from queries table: %s",
+            len(missing_queries),
+            missing_queries,
+        )
 
     manifest_name = f"scifact_en_{split}"
     manifest = EvaluationManifest(

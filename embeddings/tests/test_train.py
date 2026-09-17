@@ -354,5 +354,3 @@ def test_dataset_romanized_native_pairing_validation():
         RetrievalDataset(invalid_file)
 
     Path(invalid_file).unlink()
-
-

@@ -50,7 +50,9 @@ def resolve_manifest_path(manifest_path: Union[str, Path]) -> Path:
         if not matches:
             matches = [m for m in kaggle_input.glob(f"**/{path.name}") if m.is_dir()]
         if matches:
-            logger.info("Resolved manifest path %s to %s", str(manifest_path), str(matches[0]))
+            logger.info(
+                "Resolved manifest path %s to %s", str(manifest_path), str(matches[0])
+            )
             return matches[0]
 
     return path

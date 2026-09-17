@@ -1,0 +1,44 @@
+{
+  "kernel_slug": "e5-lora-adaptation",
+  "total_duration_seconds": 1579.300772190094,
+  "experiments_evaluated": [
+    "base_model",
+    "lora_symmetric",
+    "lora_query_asymmetric"
+  ],
+  "results_summary": [
+    {
+      "experiment": "base_model",
+      "checkpoint": "pretrained_base",
+      "native_ndcg@10": 0.9189105720683878,
+      "native_recall@20": 0.9855850340136054,
+      "roman_ndcg@10": 0.015150647137138686,
+      "roman_recall@20": 0.04677777777777778,
+      "english_ndcg@10": 0.6770437713033434,
+      "english_recall@20": 0.8468888888888889,
+      "decision": "REFERENCE BASELINE"
+    },
+    {
+      "experiment": "lora_symmetric",
+      "checkpoint": "final_model",
+      "native_ndcg@10": 0.8691671501994249,
+      "native_recall@20": 0.972843537414966,
+      "roman_ndcg@10": 0.34143228982099777,
+      "roman_recall@20": 0.4782244897959182,
+      "english_ndcg@10": 0.6570928174693753,
+      "english_recall@20": 0.8468888888888889,
+      "decision": "REJECT (Native drop: -0.0497)"
+    },
+    {
+      "experiment": "lora_query_asymmetric",
+      "checkpoint": "final_model",
+      "native_ndcg@10": 0.8800753534243221,
+      "native_recall@20": 0.9778027210884354,
+      "roman_ndcg@10": 0.2800488723893817,
+      "roman_recall@20": 0.4315532879818594,
+      "english_ndcg@10": 0.6131299868865828,
+      "english_recall@20": 0.8028888888888889,
+      "decision": "REJECT (Native drop: -0.0388, English drop: -0.0639)"
+    }
+  ]
+}

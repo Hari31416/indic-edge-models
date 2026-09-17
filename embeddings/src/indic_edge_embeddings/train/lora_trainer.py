@@ -182,9 +182,31 @@ class LoraRetrievalTrainer:
     def _encode_batch(
         self,
         batch_tensors: Dict[str, torch.Tensor],
+        disable_adapter: bool = False,
     ) -> torch.Tensor:
-        """Forward pass through transformer with mean pooling and L2 normalization."""
+        """Forward pass through transformer with mean pooling and L2 normalization.
+
+        Args:
+            batch_tensors: Dictionary containing input_ids and attention_mask.
+            disable_adapter: If True, evaluates through frozen base model without gradients or dropout.
+
+        Returns:
+            Normalized pooled embedding tensor.
+        """
         inputs = {k: v.to(self.device) for k, v in batch_tensors.items()}
+        if disable_adapter:
+            was_training = self.model.training
+            self.model.eval()
+            with torch.no_grad(), self.model.disable_adapter():
+                outputs = self.model(**inputs)
+                pooled = mean_pooling(
+                    outputs.last_hidden_state, inputs["attention_mask"]
+                )
+                emb = F.normalize(pooled, p=2, dim=1)
+            if was_training:
+                self.model.train()
+            return emb
+
         outputs = self.model(**inputs)
         pooled = mean_pooling(outputs.last_hidden_state, inputs["attention_mask"])
         return F.normalize(pooled, p=2, dim=1)
@@ -221,16 +243,15 @@ class LoraRetrievalTrainer:
             else torch.inference_mode()
         )
 
+        is_asymmetric = self.config.architecture_mode == "lora_query_asymmetric"
+
         with torch.inference_mode():
             for batch in eval_dataloader:
                 with autocast_ctx:
                     q_emb = self._encode_batch(batch["queries"])
-
-                    if self.config.architecture_mode == "lora_query_asymmetric":
-                        with self.model.disable_adapter():
-                            p_emb = self._encode_batch(batch["passages"])
-                    else:
-                        p_emb = self._encode_batch(batch["passages"])
+                    p_emb = self._encode_batch(
+                        batch["passages"], disable_adapter=is_asymmetric
+                    )
 
                     loss = self.loss_fn(
                         q_emb,
@@ -393,20 +414,24 @@ class LoraRetrievalTrainer:
 
         for epoch in range(self.config.num_epochs):
             accum_loss = 0.0
+            is_asymmetric = self.config.architecture_mode == "lora_query_asymmetric"
 
             for step, batch in enumerate(train_dataloader):
+                window_start = (
+                    step // self.config.gradient_accumulation_steps
+                ) * self.config.gradient_accumulation_steps
+                window_size = min(
+                    self.config.gradient_accumulation_steps,
+                    len(train_dataloader) - window_start,
+                )
+
                 with torch.autocast(
                     device_type="cuda", dtype=torch.float16, enabled=self.fp16
                 ):
                     q_emb = self._encode_batch(batch["queries"])
-
-                    if self.config.architecture_mode == "lora_query_asymmetric":
-                        # Keep passage representations 100% frozen in base pretrained space
-                        with self.model.disable_adapter():
-                            p_emb = self._encode_batch(batch["passages"])
-                    else:
-                        # Symmetric LoRA: queries and passages share LoRA representation
-                        p_emb = self._encode_batch(batch["passages"])
+                    p_emb = self._encode_batch(
+                        batch["passages"], disable_adapter=is_asymmetric
+                    )
 
                     loss = self.loss_fn(
                         q_emb,
@@ -414,10 +439,10 @@ class LoraRetrievalTrainer:
                         batch.get("positive_mask"),
                         batch.get("valid_mask"),
                     )
-                    loss = loss / self.config.gradient_accumulation_steps
+                    loss = loss / window_size
 
                 scaler.scale(loss).backward()
-                accum_loss += loss.item() * self.config.gradient_accumulation_steps
+                accum_loss += loss.item() * window_size
 
                 if (step + 1) % self.config.gradient_accumulation_steps == 0 or (
                     step + 1 == len(train_dataloader)
