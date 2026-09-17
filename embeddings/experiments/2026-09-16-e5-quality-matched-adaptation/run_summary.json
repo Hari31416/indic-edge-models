@@ -1,0 +1,6 @@
+{
+  "command": "python -m indic_edge_embeddings.train.run_followup_campaign --train-file quality_matched_v3/passages/train.parquet --val-file quality_matched_v3/passages/validation.parquet --native-eval-dir eval/miracl_hi_dev_fast_native --romanized-eval-dir eval/miracl_hi_dev_fast_romanized --english-eval-dir eval/scifact_en_test --learning-rate 5e-6 --num-epochs 1 --batch-size 32 --gradient-accumulation-steps 4 --checkpoints-per-epoch 1 --output-dir /kaggle/working/outputs/campaign_quality_v3",
+  "exit_code": 0,
+  "duration_seconds": 5468.9,
+  "status": "SUCCESS"
+}

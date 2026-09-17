@@ -6,7 +6,9 @@ Before recording a run, read the [shared experiment-record rules](../../AGENTS.m
 
 ## Records
 
-- [2026-09-16 E5 quality-matched adaptation](2026-09-16-e5-quality-matched-adaptation/README.md): In progress on Kaggle T4-2x GPU. Running 3-way adaptation campaign (`conservative_control`, `teacher_align`, `dual_objective`) on genuine selected passage supervision (`quality_matched_v3/passages`) with fast development evaluations.
+- [2026-09-17 E5 LoRA adaptation](2026-09-17-e5-lora-adaptation/README.md): Planned. Implementing parameter-isolated Low-Rank Adaptation (LoRA) on frozen `multilingual-e5-small` to adapt Romanized Hindi retrieval while mathematically guaranteeing 0 degradation on native Devanagari Hindi.
+
+- [2026-09-16 E5 quality-matched adaptation](2026-09-16-e5-quality-matched-adaptation/README.md): Complete. Evaluated 3 adaptation paradigms on 98.8k passage supervision rows (`quality_matched_v3/passages`). Found full-encoder InfoNCE achieves 0.3256 Romanized nDCG@10 but drops Native Devanagari by -0.0391; pairwise teacher regression aligns coordinates without learning discriminative ranking (+0.0004); dual objective suffers gradient conflict. Reject full-weight fine-tuning; proceed to parameter-isolated LoRA.
 
 - [2026-09-16 quality-matched dataset](2026-09-16-quality-matched-dataset/README.md): Complete. Generated `quality_matched_v3` dataset (98,825 training and 5,227 validation rows per arm; 76k native, 22.8k Romanized train). Verified 1:1 order/query alignment between `passages/` and `answers/` arms, 0 split leakage across 71,544 connected groups, and clean raw sample quality.
 
