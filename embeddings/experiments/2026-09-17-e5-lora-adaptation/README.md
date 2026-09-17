@@ -29,14 +29,15 @@ Success criteria:
 - **Candidate Architectures to Compare:**
   1. `lora_symmetric`: LoRA applied across both query and passage representations.
   2. `lora_query_asymmetric`: LoRA applied exclusively to query encodings while keeping passage embeddings 100% frozen in the base pretrained space.
-  3. `lora_script_gated`: Dedicated low-rank script adapter active on Romanized queries.
 - **Hardware:** Kaggle Nvidia T4-2x GPU
 
 ## Execution
 
-Status: planned.
+Status: running.
 
-Planned dispatch via `kagglex run`:
+Dispatched via `kagglex run`:
+- Kernel slug: `e5-lora-adaptation`
+- Command:
 ```bash
 python -m indic_edge_embeddings.train.run_lora_campaign \
   --train-file quality_matched_v3/passages/train.parquet \

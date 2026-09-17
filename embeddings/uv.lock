@@ -1229,6 +1229,7 @@ dependencies = [
     { name = "onnxruntime", version = "1.24.3", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
     { name = "onnxruntime", version = "1.30.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11'" },
     { name = "onnxscript" },
+    { name = "peft" },
     { name = "pyarrow" },
     { name = "scikit-learn", version = "1.7.2", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
     { name = "scikit-learn", version = "1.9.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11'" },
@@ -1256,6 +1257,7 @@ requires-dist = [
     { name = "onnx", specifier = ">=1.15.0" },
     { name = "onnxruntime", specifier = ">=1.17.0" },
     { name = "onnxscript", specifier = ">=0.1.0" },
+    { name = "peft", specifier = ">=0.10.0" },
     { name = "pyarrow", specifier = ">=14.0.0" },
     { name = "pytest", marker = "extra == 'dev'", specifier = ">=8.0.0" },
     { name = "scikit-learn", specifier = ">=1.4.0" },
@@ -2913,6 +2915,29 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/5a/82/42f767fc1c1143d6fd36efb827202a2d997a375e160a71eb2888a925aac1/pathspec-1.1.1.tar.gz", hash = "sha256:17db5ecd524104a120e173814c90367a96a98d07c45b2e10c2f3919fff91bf5a", size = 135180, upload-time = "2026-04-27T01:46:08.907Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/f1/d9/7fb5aa316bc299258e68c73ba3bddbc499654a07f151cba08f6153988714/pathspec-1.1.1-py3-none-any.whl", hash = "sha256:a00ce642f577bf7f473932318056212bc4f8bfdf53128c78bbd5af0b9b20b189", size = 57328, upload-time = "2026-04-27T01:46:07.06Z" },
+]
+
+[[package]]
+name = "peft"
+version = "0.21.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "accelerate" },
+    { name = "huggingface-hub" },
+    { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
+    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version == '3.11.*'" },
+    { name = "numpy", version = "2.5.3", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12'" },
+    { name = "packaging" },
+    { name = "psutil" },
+    { name = "pyyaml" },
+    { name = "safetensors" },
+    { name = "torch" },
+    { name = "tqdm" },
+    { name = "transformers" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/4f/91/56cc2b1b6824f5a4026750274240f26cd23465fb1a29cd14772d555433f2/peft-0.21.0.tar.gz", hash = "sha256:17f2b5a264439f4cd983c02e95954f2e948e3bcb85f75895ee307f94a55fd28f", size = 978334, upload-time = "2026-09-15T13:34:02.583Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/13/f0/29c37002f5ef5cb5be54890114d5c8f726f0cb5072a8ba0880758c912bfd/peft-0.21.0-py3-none-any.whl", hash = "sha256:b64eb75fd9dece7401c70e675b8d9de024993b70483691b41c62876f0c7809b7", size = 832883, upload-time = "2026-09-15T13:33:59.775Z" },
 ]
 
 [[package]]
