@@ -6,6 +6,10 @@ Before recording a run, read the [shared experiment-record rules](../../AGENTS.m
 
 ## Records
 
+- [2026-09-19 E5 full evaluation campaign](2026-09-19-full-eval-campaign/README.md): In progress. Evaluating 4 deployment model variants (`base_e5`, `lora_fp32`, `lora_int8`, `lora_int8_pruned`) across full 506k-document MIRACL Hindi and SciFact English benchmarks on Kaggle GPU to establish full quantitative retrieval and quantization/pruning parity.
+
+- [2026-09-18 E5 LoRA scaled](2026-09-18-e5-lora-scaled/README.md): Complete. Scaled parameter-isolated `LoRA Symmetric` adaptation ($r=16, \alpha=32$) to 3 epochs (2,316 steps) on Kaggle dual T4 GPUs. Romanized nDCG@10 reached 0.3937 (+26.0x over baseline) with 0.5403 Recall@20 (+11.5x gain) while retaining 0.8645 Native Devanagari nDCG@10 (0.9763 Recall@20) and 0.6489 English nDCG@10. Accepted `LoRA Symmetric` 3-epoch checkpoint for ONNX export and in-browser deployment.
+
 - [2026-09-17 E5 LoRA adaptation](2026-09-17-e5-lora-adaptation/README.md): Complete. Evaluated parameter-isolated Low-Rank Adaptation (LoRA, $r=16, \alpha=32$, 1.13% trainable params) on frozen `multilingual-e5-small`. Accepted `LoRA Symmetric` achieving 0.3414 Romanized nDCG@10 (22.5x gain over baseline) and 0.6571 English nDCG@10 with a modest -0.0497 native Devanagari drop (0.8692 nDCG@10, 0.9728 Recall@20). Next: ONNX export and browser INT8 quantization.
 
 - [2026-09-16 E5 quality-matched adaptation](2026-09-16-e5-quality-matched-adaptation/README.md): Complete. Evaluated 3 adaptation paradigms on 98.8k passage supervision rows (`quality_matched_v3/passages`). Found full-encoder InfoNCE achieves 0.3256 Romanized nDCG@10 but drops Native Devanagari by -0.0391; pairwise teacher regression aligns coordinates without learning discriminative ranking (+0.0004); dual objective suffers gradient conflict. Reject full-weight fine-tuning; proceed to parameter-isolated LoRA.

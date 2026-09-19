@@ -1,0 +1,7 @@
+{
+  "command": "python -m indic_edge_embeddings.train.run_lora_campaign --train-file quality_matched_v3/passages/train.parquet --val-file quality_matched_v3/passages/validation.parquet --native-eval-dir eval/miracl_hi_dev_fast_native --romanized-eval-dir eval/miracl_hi_dev_fast_romanized --english-eval-dir eval/scifact_en_test --experiments lora_symmetric --lora-r 16 --lora-alpha 32 --learning-rate 1e-4 --num-epochs 3 --batch-size 32 --gradient-accumulation-steps 4 --output-dir /kaggle/working/outputs/campaign_lora_scaled",
+  "executed_command": "python -m indic_edge_embeddings.train.run_lora_campaign --train-file quality_matched_v3/passages/train.parquet --val-file quality_matched_v3/passages/validation.parquet --native-eval-dir eval/miracl_hi_dev_fast_native --romanized-eval-dir eval/miracl_hi_dev_fast_romanized --english-eval-dir eval/scifact_en_test --experiments lora_symmetric --lora-r 16 --lora-alpha 32 --learning-rate 1e-4 --num-epochs 3 --batch-size 32 --gradient-accumulation-steps 4 --output-dir /kaggle/working/outputs/campaign_lora_scaled",
+  "exit_code": 0,
+  "duration_seconds": 3269.73,
+  "status": "SUCCESS"
+}

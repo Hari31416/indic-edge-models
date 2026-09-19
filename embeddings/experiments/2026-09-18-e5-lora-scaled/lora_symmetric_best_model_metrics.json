@@ -1,0 +1,31 @@
+{
+  "experiment": "lora_symmetric",
+  "title": "LoRA Symmetric (r=16, alpha=32, LR 0.0001) (best_model)",
+  "checkpoint": "best_model",
+  "checkpoint_path": "/kaggle/working/outputs/campaign_lora_scaled/01_lora_symmetric/best_model",
+  "native_ndcg@10": 0.8646461582661186,
+  "native_recall@20": 0.9762721088435374,
+  "roman_ndcg@10": 0.39359653677724193,
+  "roman_recall@20": 0.5374149659863946,
+  "english_ndcg@10": 0.6487814915762827,
+  "english_recall@20": 0.8318888888888889,
+  "decision": "REJECT (Native drop: -0.0543, English drop: -0.0283)",
+  "detailed_metrics": {
+    "native": {
+      "ndcg@10": 0.8646461582661186,
+      "recall@20": 0.9762721088435374,
+      "mrr@10": 0.8700589569160999
+    },
+    "romanized": {
+      "ndcg@10": 0.39359653677724193,
+      "recall@20": 0.5374149659863946,
+      "mrr@10": 0.4081700680272109
+    },
+    "english": {
+      "ndcg@10": 0.6487814915762827,
+      "recall@20": 0.8318888888888889,
+      "mrr@10": 0.6091534391534391
+    }
+  },
+  "training_summary": null
+}

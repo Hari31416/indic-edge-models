@@ -1,6 +1,6 @@
 # Embedding project steps
 
-Status: 17 September 2026. [LoRA adaptation](experiments/2026-09-17-e5-lora-adaptation/README.md) is complete: parameter-isolated LoRA symmetric ($r=16, \alpha=32$) achieved 0.3414 Romanized nDCG@10 (22.5x gain over baseline) and 0.6571 English nDCG@10 with a modest -0.0497 native drop (0.8692 nDCG@10, 0.9728 Recall@20). Selected `LoRA Symmetric` as the adaptation model for deployment. Next: Step 5 compression and ONNX browser export/quantization.
+Status: 18 September 2026. [Scaled LoRA adaptation](experiments/2026-09-18-e5-lora-scaled/README.md) is complete: 3-epoch parameter-isolated LoRA symmetric ($r=16, \alpha=32$) reached 0.3937 Romanized nDCG@10 (+26.0x over baseline) with 0.5403 Recall@20 (+11.5x gain) while retaining 0.8645 Native Devanagari nDCG@10 (0.9763 Recall@20) and 0.6489 English nDCG@10. Accepted `LoRA Symmetric` 3-epoch checkpoint for deployment. Next: Step 5 compression (vocabulary pruning) and ONNX browser export/quantization.
 
 This sequence will change as results arrive. Complete the next useful experiment, record what it establishes, and revise the remaining steps. Later stages are conditional; a useful result does not require implementing every technique listed here.
 
