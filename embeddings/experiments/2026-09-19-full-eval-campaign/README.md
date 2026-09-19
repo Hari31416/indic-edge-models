@@ -40,7 +40,8 @@ Success criteria:
 Status: running.
 
 Dispatched via `kagglex run`:
-- Kernel slug: `e5-full-eval-campaign`
+- Kernel: `hari31416/e5-full-4-model-evaluation`
+- Dataset: `hari31416/indic-edge-e5-models`
 - Command:
 ```bash
 python -m indic_edge_embeddings.eval.run_kaggle_full_eval
