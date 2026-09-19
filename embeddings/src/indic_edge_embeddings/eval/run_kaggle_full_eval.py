@@ -64,20 +64,20 @@ def main() -> None:
 
     if dataset_dir:
         logger.info("Found mounted Kaggle dataset at %s", str(dataset_dir))
-        adapter_path = dataset_dir / "lora_adapter"
+        lora_fp32_dir = dataset_dir / "lora_fp32" if (dataset_dir / "lora_fp32").exists() else None
         lora_int8_path = dataset_dir / "lora_int8" / "model_int8.onnx"
         lora_int8_pruned_path = dataset_dir / "lora_int8_pruned" / "model_int8.onnx"
+        adapter_path = dataset_dir / "lora_adapter"
     else:
         logger.info(
             "No mounted dataset found; using local paths and in-command export..."
         )
+        lora_fp32_dir = None
         adapter_path = Path(
             "experiments/2026-09-18-e5-lora-scaled/outputs/campaign_lora_scaled/01_lora_symmetric/final_model/adapter"
         )
         lora_int8_path = None
         lora_int8_pruned_path = None
-
-    logger.info("Using LoRA adapter at: %s", str(adapter_path))
 
     # Step 1: Build Full Evaluation Manifests
     run_cmd(
@@ -89,22 +89,25 @@ def main() -> None:
         "Build SciFact English test evaluation manifest",
     )
 
-    # Step 2: Merge LoRA FP32 Model
-    lora_fp32_dir = models_tmp / "lora_fp32"
-    logger.info("Merging LoRA adapter into base model for FP32 PyTorch evaluation...")
-    import torch
-    from peft import PeftModel
-    from transformers import AutoModel, AutoTokenizer
+    # Step 2: Prepare LoRA FP32 Model
+    if lora_fp32_dir is None or not lora_fp32_dir.exists():
+        lora_fp32_dir = models_tmp / "lora_fp32"
+        logger.info("Merging LoRA adapter into base model for FP32 PyTorch evaluation...")
+        import torch
+        from peft import PeftModel
+        from transformers import AutoModel, AutoTokenizer
 
-    base = AutoModel.from_pretrained(
-        "intfloat/multilingual-e5-small", trust_remote_code=True
-    )
-    tok = AutoTokenizer.from_pretrained(str(adapter_path), trust_remote_code=True)
-    peft_m = PeftModel.from_pretrained(base, str(adapter_path))
-    merged = peft_m.merge_and_unload()
-    merged.save_pretrained(str(lora_fp32_dir))
-    tok.save_pretrained(str(lora_fp32_dir))
-    logger.info("LoRA FP32 model saved to %s", str(lora_fp32_dir))
+        base = AutoModel.from_pretrained(
+            "intfloat/multilingual-e5-small", trust_remote_code=True
+        )
+        tok = AutoTokenizer.from_pretrained(str(adapter_path), trust_remote_code=True)
+        peft_m = PeftModel.from_pretrained(base, str(adapter_path))
+        merged = peft_m.merge_and_unload()
+        merged.save_pretrained(str(lora_fp32_dir))
+        tok.save_pretrained(str(lora_fp32_dir))
+        logger.info("LoRA FP32 model saved to %s", str(lora_fp32_dir))
+    else:
+        logger.info("Using pre-merged LoRA FP32 model from %s", str(lora_fp32_dir))
 
     # Step 3: Export ONNX models if not provided in dataset
     if lora_int8_path is None or not lora_int8_path.exists():

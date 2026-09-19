@@ -41,6 +41,8 @@ artifacts/
 **/artifacts/
 outputs/
 **/outputs/
+staging/
+**/staging/
 .kaggle_staging/
 *.onnx
 *.bin
