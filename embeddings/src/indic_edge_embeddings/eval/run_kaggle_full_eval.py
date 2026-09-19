@@ -43,41 +43,47 @@ def main() -> None:
     cache_tmp.mkdir(parents=True, exist_ok=True)
     output_dir.mkdir(parents=True, exist_ok=True)
 
-    # Locate dataset if mounted on Kaggle
-    dataset_dir = None
-    for candidate in [
-        Path("/kaggle/input/indic-edge-e5-models"),
-        Path("/kaggle/input/indic_edge_e5_models"),
-    ]:
-        if candidate.exists():
-            dataset_dir = candidate
-            break
-
-    if dataset_dir is None and Path("/kaggle/input").exists():
-        matches = [
-            m
-            for m in Path("/kaggle/input").glob("**/indic-edge-e5-models")
-            if m.is_dir()
-        ]
-        if matches:
-            dataset_dir = matches[0]
-
-    if dataset_dir:
-        logger.info("Found mounted Kaggle dataset at %s", str(dataset_dir))
-        lora_fp32_dir = dataset_dir / "lora_fp32" if (dataset_dir / "lora_fp32").exists() else None
-        lora_int8_path = dataset_dir / "lora_int8" / "model_int8.onnx"
-        lora_int8_pruned_path = dataset_dir / "lora_int8_pruned" / "model_int8.onnx"
-        adapter_path = dataset_dir / "lora_adapter"
-    else:
-        logger.info(
-            "No mounted dataset found; using local paths and in-command export..."
+    # Clean up incompatible torchao on Kaggle environment if present
+    try:
+        subprocess.run(
+            [sys.executable, "-m", "pip", "uninstall", "-y", "torchao"],
+            check=False,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
         )
-        lora_fp32_dir = None
+    except Exception:
+        pass
+
+    # Locate dataset if mounted on Kaggle
+    lora_fp32_dir = None
+    lora_int8_path = None
+    lora_int8_pruned_path = None
+    adapter_path = None
+
+    if Path("/kaggle/input").exists():
+        logger.info("Scanning /kaggle/input for models...")
+        for p in Path("/kaggle/input").rglob("*"):
+            if p.is_dir() and (p / "model.safetensors").exists() and "lora_fp32" in str(p):
+                lora_fp32_dir = p
+            elif p.is_file() and p.name == "model_int8.onnx":
+                if "pruned" in str(p):
+                    lora_int8_pruned_path = p
+                else:
+                    lora_int8_path = p
+            elif p.is_dir() and (p / "adapter_config.json").exists():
+                adapter_path = p
+
+    if lora_fp32_dir:
+        logger.info("Found pre-merged FP32 model at: %s", str(lora_fp32_dir))
+    if lora_int8_path:
+        logger.info("Found INT8 full-vocab ONNX model at: %s", str(lora_int8_path))
+    if lora_int8_pruned_path:
+        logger.info("Found INT8 pruned ONNX model at: %s", str(lora_int8_pruned_path))
+
+    if adapter_path is None:
         adapter_path = Path(
             "experiments/2026-09-18-e5-lora-scaled/outputs/campaign_lora_scaled/01_lora_symmetric/final_model/adapter"
         )
-        lora_int8_path = None
-        lora_int8_pruned_path = None
 
     # Step 1: Build Full Evaluation Manifests
     run_cmd(
@@ -138,8 +144,8 @@ def main() -> None:
         f"--romanized-eval-dir /tmp/eval/miracl_hi_dev_romanized "
         f"--english-eval-dir /tmp/eval/scifact_en_test "
         f"--lora-fp32-path {lora_fp32_dir} "
-        f"--lora-int8-path {lora_int8_dir}/model_int8.onnx "
-        f"--lora-int8-pruned-path {lora_int8_pruned_dir}/model_int8.onnx "
+        f"--lora-int8-path {lora_int8_path} "
+        f"--lora-int8-pruned-path {lora_int8_pruned_path} "
         f"--output-dir {output_dir} "
         f"--cache-dir {cache_tmp} "
         f"--batch-size 512",
