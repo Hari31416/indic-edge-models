@@ -112,10 +112,69 @@ class EmbeddingExporter:
         self.normalize = normalize
 
         logger.info("Loading tokenizer and model for export: %s", self.model_name)
-        self.tokenizer = AutoTokenizer.from_pretrained(
-            self.model_name, trust_remote_code=True
-        )
-        base_model = AutoModel.from_pretrained(self.model_name, trust_remote_code=True)
+        model_path = Path(self.model_name)
+
+        if model_path.exists() and (model_path / "adapter_config.json").exists():
+            import json
+            from peft import PeftModel
+
+            with open(model_path / "adapter_config.json", "r", encoding="utf-8") as f:
+                adapter_cfg = json.load(f)
+            base_model_name = adapter_cfg.get(
+                "base_model_name_or_path", "intfloat/multilingual-e5-small"
+            )
+            logger.info(
+                "Detected PEFT adapter directory at %s. Loading base model '%s' and merging adapter...",
+                str(model_path.resolve()),
+                base_model_name,
+            )
+            self.tokenizer = AutoTokenizer.from_pretrained(
+                str(model_path.resolve()), trust_remote_code=True
+            )
+            base_model = AutoModel.from_pretrained(
+                base_model_name, trust_remote_code=True
+            )
+            peft_model = PeftModel.from_pretrained(
+                base_model, str(model_path.resolve())
+            )
+            merged_model = peft_model.merge_and_unload()
+            base_model = merged_model
+        elif (
+            model_path.exists()
+            and (model_path / "adapter").exists()
+            and (model_path / "adapter" / "adapter_config.json").exists()
+        ):
+            import json
+            from peft import PeftModel
+
+            adapter_dir = (model_path / "adapter").resolve()
+            with open(adapter_dir / "adapter_config.json", "r", encoding="utf-8") as f:
+                adapter_cfg = json.load(f)
+            base_model_name = adapter_cfg.get(
+                "base_model_name_or_path", "intfloat/multilingual-e5-small"
+            )
+            logger.info(
+                "Detected PEFT adapter subfolder at %s. Loading base model '%s' and merging adapter...",
+                str(adapter_dir),
+                base_model_name,
+            )
+            self.tokenizer = AutoTokenizer.from_pretrained(
+                str(model_path.resolve()), trust_remote_code=True
+            )
+            base_model = AutoModel.from_pretrained(
+                base_model_name, trust_remote_code=True
+            )
+            peft_model = PeftModel.from_pretrained(base_model, str(adapter_dir))
+            merged_model = peft_model.merge_and_unload()
+            base_model = merged_model
+        else:
+            self.tokenizer = AutoTokenizer.from_pretrained(
+                self.model_name, trust_remote_code=True
+            )
+            base_model = AutoModel.from_pretrained(
+                self.model_name, trust_remote_code=True
+            )
+
         self.model = EmbeddingWithPooling(
             base_model=base_model,
             pooling=self.pooling,
