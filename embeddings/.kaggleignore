@@ -17,6 +17,9 @@ artifacts/
 **/*.log
 *.parquet
 *.pt
-*.bin
+staging/
+staging/**
+staged_adapters/
+staged_adapters/**
 *.safetensors
 *.onnx

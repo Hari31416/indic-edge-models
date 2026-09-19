@@ -52,3 +52,7 @@ dataset-metadata.json
 dataset_metadata.json
 
 .kagglex/
+
+# OS
+.DS_Store
+**/.DS_Store

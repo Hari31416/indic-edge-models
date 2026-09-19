@@ -32,7 +32,7 @@ class Query:
 
 
 def resolve_manifest_path(manifest_path: Union[str, Path]) -> Path:
-    """Resolve manifest directory path, searching recursively in /kaggle/input if on Kaggle.
+    """Resolve manifest directory path, searching locally and recursively in /kaggle/input if on Kaggle.
 
     Args:
         manifest_path: Manifest directory path.
@@ -43,6 +43,14 @@ def resolve_manifest_path(manifest_path: Union[str, Path]) -> Path:
     path = Path(manifest_path)
     if path.exists():
         return path
+
+    for candidate in [
+        Path("data/eval") / path,
+        Path("data/eval") / path.name,
+        Path("data") / path,
+    ]:
+        if candidate.exists():
+            return candidate
 
     kaggle_input = Path("/kaggle/input")
     if kaggle_input.exists():

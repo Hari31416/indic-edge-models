@@ -14,7 +14,7 @@ logger = logging.getLogger(__name__)
 
 
 def resolve_data_path(file_path: Union[str, Path]) -> Path:
-    """Resolve file path, searching recursively in /kaggle/input if running on Kaggle.
+    """Resolve file path, searching locally and recursively in /kaggle/input if running on Kaggle.
 
     Args:
         file_path: Input file path.
@@ -25,6 +25,14 @@ def resolve_data_path(file_path: Union[str, Path]) -> Path:
     path = Path(file_path)
     if path.exists():
         return path
+
+    for candidate in [
+        Path("data/train") / path,
+        Path("data/train") / path.name,
+        Path("data") / path,
+    ]:
+        if candidate.exists():
+            return candidate
 
     kaggle_input = Path("/kaggle/input")
     if kaggle_input.exists():

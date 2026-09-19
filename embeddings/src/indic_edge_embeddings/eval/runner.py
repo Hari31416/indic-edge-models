@@ -93,23 +93,51 @@ class DenseRetrievalEvaluator:
 
         self.fp16 = fp16 and (self.device.type == "cuda")
 
-        logger.info(
-            "Loading model: %s on %s (batch_size=%d, max_length=%d, fp16=%s)",
-            self.model_name,
-            self.device,
-            self.batch_size,
-            self.max_length,
-            self.fp16,
+        self.is_onnx = self.model_name.endswith(".onnx") or (
+            model_path.is_file() and model_path.suffix == ".onnx"
         )
-        self.tokenizer = AutoTokenizer.from_pretrained(
-            self.model_name, trust_remote_code=True
-        )
-        base_model = AutoModel.from_pretrained(self.model_name, trust_remote_code=True)
-        self.hidden_dim = base_model.config.hidden_size
 
-        self.model = base_model.to(self.device)
+        if self.is_onnx:
+            import onnxruntime as ort
 
-        self.model.eval()
+            logger.info(
+                "Initializing ONNX Runtime InferenceSession for %s...", self.model_name
+            )
+            providers = ["CPUExecutionProvider"]
+            if (
+                torch.cuda.is_available()
+                and "CUDAExecutionProvider" in ort.get_available_providers()
+            ):
+                providers.insert(0, "CUDAExecutionProvider")
+
+            self.onnx_session = ort.InferenceSession(
+                self.model_name, providers=providers
+            )
+            tok_dir = str(model_path.parent) if model_path.exists() else self.model_name
+            self.tokenizer = AutoTokenizer.from_pretrained(
+                tok_dir, trust_remote_code=True
+            )
+            self.hidden_dim = 384
+            self.model = None
+        else:
+            logger.info(
+                "Loading model: %s on %s (batch_size=%d, max_length=%d, fp16=%s)",
+                self.model_name,
+                self.device,
+                self.batch_size,
+                self.max_length,
+                self.fp16,
+            )
+            self.tokenizer = AutoTokenizer.from_pretrained(
+                self.model_name, trust_remote_code=True
+            )
+            base_model = AutoModel.from_pretrained(
+                self.model_name, trust_remote_code=True
+            )
+            self.hidden_dim = base_model.config.hidden_size
+
+            self.model = base_model.to(self.device)
+            self.model.eval()
 
     def encode(
         self,
@@ -149,7 +177,7 @@ class DenseRetrievalEvaluator:
             else torch.inference_mode()
         )
 
-        with torch.inference_mode():
+        if self.is_onnx:
             for batch_idx, i in enumerate(
                 tqdm(
                     range(0, num_texts, self.batch_size),
@@ -164,34 +192,59 @@ class DenseRetrievalEvaluator:
                     padding=True,
                     truncation=True,
                     max_length=self.max_length,
-                    return_tensors="pt",
-                ).to(self.device)
-
-                with autocast_ctx:
-                    outputs = self.model(**encoded)
-
-                    if self.pooling == "mean":
-                        embeddings = mean_pooling(
-                            outputs.last_hidden_state, encoded["attention_mask"]
-                        )
-                    elif self.pooling == "cls":
-                        embeddings = outputs.last_hidden_state[:, 0]
-                    else:
-                        raise ValueError(
-                            f"Unsupported pooling strategy: {self.pooling}"
-                        )
-
-                    if self.normalize:
-                        embeddings = torch.nn.functional.normalize(
-                            embeddings, p=2, dim=1
-                        )
-
+                    return_tensors="np",
+                )
+                onnx_inputs = {
+                    "input_ids": encoded["input_ids"].astype(np.int64),
+                    "attention_mask": encoded["attention_mask"].astype(np.int64),
+                }
+                out = self.onnx_session.run(None, onnx_inputs)
                 batch_len = len(batch_texts)
-                output_matrix[i : i + batch_len] = embeddings.float().cpu().numpy()
+                output_matrix[i : i + batch_len] = out[0]
+        else:
+            with torch.inference_mode():
+                for batch_idx, i in enumerate(
+                    tqdm(
+                        range(0, num_texts, self.batch_size),
+                        total=total_batches,
+                        desc=desc,
+                        ncols=85,
+                    )
+                ):
+                    batch_texts = ordered_texts[i : i + self.batch_size]
+                    encoded = self.tokenizer(
+                        batch_texts,
+                        padding=True,
+                        truncation=True,
+                        max_length=self.max_length,
+                        return_tensors="pt",
+                    ).to(self.device)
 
-                del encoded, outputs, embeddings
-                if self.device.type == "mps" and (batch_idx + 1) % 25 == 0:
-                    torch.mps.empty_cache()
+                    with autocast_ctx:
+                        outputs = self.model(**encoded)
+
+                        if self.pooling == "mean":
+                            embeddings = mean_pooling(
+                                outputs.last_hidden_state, encoded["attention_mask"]
+                            )
+                        elif self.pooling == "cls":
+                            embeddings = outputs.last_hidden_state[:, 0]
+                        else:
+                            raise ValueError(
+                                f"Unsupported pooling strategy: {self.pooling}"
+                            )
+
+                        if self.normalize:
+                            embeddings = torch.nn.functional.normalize(
+                                embeddings, p=2, dim=1
+                            )
+
+                    batch_len = len(batch_texts)
+                    output_matrix[i : i + batch_len] = embeddings.float().cpu().numpy()
+
+                    del encoded, outputs, embeddings
+                    if self.device.type == "mps" and (batch_idx + 1) % 25 == 0:
+                        torch.mps.empty_cache()
 
         stacked = output_matrix
         if sort_indices is not None:

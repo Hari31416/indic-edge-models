@@ -79,8 +79,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--experiments",
         type=str,
-        default="lora_symmetric,lora_query_asymmetric",
-        help="Comma-separated list of experiments to run (default: lora_symmetric,lora_query_asymmetric)",
+        default="lora_symmetric",
+        help="Comma-separated list of experiments to run (default: lora_symmetric)",
     )
     parser.add_argument(
         "--lora-r",
@@ -488,64 +488,83 @@ def run_lora_campaign() -> None:
 
         train_summary = trainer.train()
 
+        checkpoints_to_eval = []
+        best_model_path = exp_dir / "best_model"
         final_model_path = exp_dir / "final_model"
-        if not final_model_path.exists():
-            final_model_path = exp_dir / "best_model"
 
-        # Evaluate checkpoint according to its architecture mode
-        if exp_info["architecture_mode"] == "lora_query_asymmetric":
-            eval_metrics = evaluate_asymmetric_checkpoint(
-                query_checkpoint_path=str(final_model_path),
-                base_corpus_embeddings=base_corpus_embeddings,
-                manifests=manifests,
-                batch_size=args.eval_batch_size,
-                fp16=not args.no_fp16,
-            )
-        else:
-            eval_metrics = evaluate_symmetric_checkpoint(
-                checkpoint_path=str(final_model_path),
-                manifests=manifests,
-                cache_dir=args.cache_dir,
-                batch_size=args.eval_batch_size,
-                fp16=not args.no_fp16,
-            )
+        if best_model_path.exists():
+            checkpoints_to_eval.append(("best_model", best_model_path))
+        if final_model_path.exists():
+            checkpoints_to_eval.append(("final_model", final_model_path))
+        if not checkpoints_to_eval:
+            checkpoints_to_eval.append(("final_model", exp_dir))
 
-        native_ndcg = eval_metrics["native"]["ndcg@10"]
-        roman_ndcg = eval_metrics["romanized"]["ndcg@10"]
-        en_ndcg = eval_metrics["english"]["ndcg@10"]
+        for ckpt_label, ckpt_path in checkpoints_to_eval:
+            logger.info("Evaluating %s checkpoint at %s...", ckpt_label, str(ckpt_path))
+            if exp_info["architecture_mode"] == "lora_query_asymmetric":
+                eval_metrics = evaluate_asymmetric_checkpoint(
+                    query_checkpoint_path=str(ckpt_path),
+                    base_corpus_embeddings=base_corpus_embeddings,
+                    manifests=manifests,
+                    batch_size=args.eval_batch_size,
+                    fp16=not args.no_fp16,
+                )
+            else:
+                eval_metrics = evaluate_symmetric_checkpoint(
+                    checkpoint_path=str(ckpt_path),
+                    manifests=manifests,
+                    cache_dir=args.cache_dir,
+                    batch_size=args.eval_batch_size,
+                    fp16=not args.no_fp16,
+                )
 
-        native_pass = native_ndcg >= (native_baseline - 0.02)
-        english_pass = en_ndcg >= (english_baseline - 0.02)
-        roman_pass = roman_ndcg >= roman_target
+            native_ndcg = eval_metrics["native"]["ndcg@10"]
+            roman_ndcg = eval_metrics["romanized"]["ndcg@10"]
+            en_ndcg = eval_metrics["english"]["ndcg@10"]
 
-        if native_pass and english_pass and roman_pass:
-            decision = "ACCEPT (Native retained, English retained, Roman >= 0.40)"
-        elif native_pass and english_pass:
-            decision = f"PROGRESS (Preserved, Roman: {roman_ndcg:.4f})"
-        else:
-            failed_gates = []
-            if not native_pass:
-                failed_gates.append(f"Native drop: {native_ndcg - native_baseline:.4f}")
-            if not english_pass:
-                failed_gates.append(f"English drop: {en_ndcg - english_baseline:.4f}")
-            decision = f"REJECT ({', '.join(failed_gates)})"
+            native_pass = native_ndcg >= (native_baseline - 0.02)
+            english_pass = en_ndcg >= (english_baseline - 0.02)
+            roman_pass = roman_ndcg >= roman_target
 
-        record = {
-            "experiment": exp_key,
-            "title": exp_info["title"],
-            "checkpoint": "final_model",
-            "checkpoint_path": str(final_model_path),
-            "native_ndcg@10": native_ndcg,
-            "native_recall@20": eval_metrics["native"]["recall@20"],
-            "roman_ndcg@10": roman_ndcg,
-            "roman_recall@20": eval_metrics["romanized"]["recall@20"],
-            "english_ndcg@10": en_ndcg,
-            "english_recall@20": eval_metrics["english"]["recall@20"],
-            "decision": decision,
-            "detailed_metrics": eval_metrics,
-            "training_summary": train_summary,
-        }
-        campaign_results.append(record)
+            if native_pass and english_pass and roman_pass:
+                decision = "ACCEPT (Native retained, English retained, Roman >= 0.40)"
+            elif native_pass and english_pass:
+                decision = f"PROGRESS (Preserved, Roman: {roman_ndcg:.4f})"
+            else:
+                failed_gates = []
+                if not native_pass:
+                    failed_gates.append(
+                        f"Native drop: {native_ndcg - native_baseline:.4f}"
+                    )
+                if not english_pass:
+                    failed_gates.append(
+                        f"English drop: {en_ndcg - english_baseline:.4f}"
+                    )
+                decision = f"REJECT ({', '.join(failed_gates)})"
+
+            record = {
+                "experiment": exp_key,
+                "title": f"{exp_info['title']} ({ckpt_label})",
+                "checkpoint": ckpt_label,
+                "checkpoint_path": str(ckpt_path),
+                "native_ndcg@10": native_ndcg,
+                "native_recall@20": eval_metrics["native"]["recall@20"],
+                "roman_ndcg@10": roman_ndcg,
+                "roman_recall@20": eval_metrics["romanized"]["recall@20"],
+                "english_ndcg@10": en_ndcg,
+                "english_recall@20": eval_metrics["english"]["recall@20"],
+                "decision": decision,
+                "detailed_metrics": eval_metrics,
+                "training_summary": (
+                    train_summary if ckpt_label == "final_model" else None
+                ),
+            }
+            campaign_results.append(record)
+
+            # Save individual checkpoint metrics JSON
+            ckpt_metrics_file = output_root / f"{exp_key}_{ckpt_label}_metrics.json"
+            with open(ckpt_metrics_file, "w", encoding="utf-8") as f:
+                json.dump(record, f, indent=2)
 
     total_duration = time.time() - start_total_time
 
