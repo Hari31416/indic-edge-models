@@ -85,7 +85,7 @@ def main() -> None:
         "Build full MIRACL Hindi dev evaluation manifests (Native & Romanized)",
     )
     run_cmd(
-        f"{sys.executable} -m indic_edge_embeddings.eval.build_english_manifest --output-dir /tmp/eval/scifact_en_test --dataset scifact --split test",
+        f"{sys.executable} -m indic_edge_embeddings.eval.build_english_manifest --output-dir /tmp/eval --split test",
         "Build SciFact English test evaluation manifest",
     )
 
