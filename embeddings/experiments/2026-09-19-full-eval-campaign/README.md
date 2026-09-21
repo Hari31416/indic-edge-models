@@ -37,7 +37,7 @@ Success criteria:
 
 ## Execution
 
-Status: running.
+Status: completed with failure (exit code 1, exit status 137).
 
 Dispatched via `kagglex run`:
 - Kernel: `hari31416/e5-full-4-model-evaluation`
@@ -47,20 +47,39 @@ Dispatched via `kagglex run`:
 python -m indic_edge_embeddings.eval.run_kaggle_full_eval
 ```
 
+Duration: 19,973 seconds (~5.5 hours). The run evaluated `base_e5` and `lora_fp32` across all splits, but was killed (OOM SIGKILL) at 79% through corpus encoding for the third model variant (`lora_int8`).
+
 ## Outputs
 
-Pending completion of remote execution.
+Output artifacts pulled from Kaggle:
+- `base_e5_metrics.json`
+- `lora_fp32_metrics.json`
+- `run_summary.json`
+
+Summary comparison on the full 506k MIRACL Hindi corpus and SciFact English benchmark:
+
+| Metric | Base E5 (FP32) | LoRA Symmetric (FP32) | Delta |
+| :--- | :--- | :--- | :--- |
+| **Native Hindi nDCG@10** | 0.5513 | 0.4638 | -0.0875 (-15.9%) |
+| **Native Hindi Recall@20** | 0.7766 | 0.6788 | -0.0978 (-12.6%) |
+| **Romanized Hindi nDCG@10** | 0.0000 | 0.1103 | +0.1103 |
+| **Romanized Hindi Recall@20** | 0.0000 | 0.1980 | +0.1980 |
+| **English SciFact nDCG@10** | 0.6770 | 0.6489 | -0.0281 (-4.1%) |
+| **English SciFact Recall@20** | 0.8469 | 0.8319 | -0.0150 (-1.8%) |
+
+`lora_int8` and `lora_int8_pruned` variants did not finish evaluation due to memory exhaustion during corpus vector re-encoding.
 
 ## Interpretation
 
-Pending remote execution results.
+1. **Severe native regression under full corpus scale.** On the full 506,264 document corpus, adapting the model to Romanized Hindi caused a 0.0875 drop in native Devanagari nDCG@10 (0.5513 down to 0.4638) and dropped Recall@20 by nearly 10 percentage points.
+2. **Underwhelming Romanized retrieval.** While Romanized retrieval showed high relative gains over zero baseline, absolute retrieval on the full corpus reached only 0.1103 nDCG@10 and 0.1980 Recall@20. Distractor density in the 506k corpus overwhelmed cross-script discriminability.
+3. **Execution limits.** Evaluating full-corpus embeddings across multiple model variants exceeded Kaggle container RAM limits (OOM at 79% on batch 786/989).
 
 ## Decision
 
-Pending remote execution results.
+Stop the embedding adaptation project. The tradeoff between native representation degradation and modest Romanized retrieval gains does not produce a competitive edge retrieval model. Close out the embedding subproject and transition focus to pair-specific translation.
 
 ## Next step
 
-1. Monitor execution logs and pull outputs via `kagglex pull`.
-2. Update results table and verify export/pruning parity on the 506k corpus.
-3. Benchmark the finalized pruned INT8 artifact in the browser test harness.
+Conclude embedding development. Shift active implementation to the translation subproject starting with baseline measurements on English to Hindi.
+

@@ -1,6 +1,6 @@
 # Embedding project steps
 
-Status: 18 September 2026. [Scaled LoRA adaptation](experiments/2026-09-18-e5-lora-scaled/README.md) is complete: 3-epoch parameter-isolated LoRA symmetric ($r=16, \alpha=32$) reached 0.3937 Romanized nDCG@10 (+26.0x over baseline) with 0.5403 Recall@20 (+11.5x gain) while retaining 0.8645 Native Devanagari nDCG@10 (0.9763 Recall@20) and 0.6489 English nDCG@10. Accepted `LoRA Symmetric` 3-epoch checkpoint for deployment. Next: Step 5 compression (vocabulary pruning) and ONNX browser export/quantization.
+Status: Concluded (21 September 2026). The [full evaluation campaign](experiments/2026-09-19-full-eval-campaign/README.md) on the 506k-document MIRACL benchmark showed that while Romanized retrieval reached 0.1103 nDCG@10 from zero baseline, it degraded native Devanagari retrieval significantly (-0.0875 nDCG@10, down from 0.5513 to 0.4638, and -0.0978 Recall@20). Further evaluation hit Kaggle container memory limits. The embedding adaptation project is concluded. Active focus shifts to pair-specific translation.
 
 This sequence will change as results arrive. Complete the next useful experiment, record what it establishes, and revise the remaining steps. Later stages are conditional; a useful result does not require implementing every technique listed here.
 

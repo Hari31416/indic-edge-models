@@ -1,12 +1,12 @@
 # Embedding experiment history
 
-Baseline measurements, Romanization repairs, and the first training pilot are recorded below. Follow-up adaptation is planned; browser validation remains pending.
+Baseline measurements, Romanization repairs, training pilots, and final full-corpus evaluations are recorded below. The embedding subproject is concluded.
 
 Before recording a run, read the [shared experiment-record rules](../../AGENTS.md#experiment-records). Keep a dated directory here for each substantive experiment or roadmap step, including failed and interrupted attempts.
 
 ## Records
 
-- [2026-09-19 E5 full evaluation campaign](2026-09-19-full-eval-campaign/README.md): In progress. Evaluating 4 deployment model variants (`base_e5`, `lora_fp32`, `lora_int8`, `lora_int8_pruned`) across full 506k-document MIRACL Hindi and SciFact English benchmarks on Kaggle GPU to establish full quantitative retrieval and quantization/pruning parity.
+- [2026-09-19 E5 full evaluation campaign](2026-09-19-full-eval-campaign/README.md): Completed with failure (OOM kill during INT8 corpus encoding). Evaluated `base_e5` and `lora_fp32` on full 506k MIRACL Hindi. LoRA caused severe native Devanagari regression (nDCG@10 0.5513 down to 0.4638) with modest Romanized retrieval (nDCG@10 0.1103). Decision: conclude embedding subproject and pivot to pair-specific translation.
 
 - [2026-09-18 E5 LoRA scaled](2026-09-18-e5-lora-scaled/README.md): Complete. Scaled parameter-isolated `LoRA Symmetric` adaptation ($r=16, \alpha=32$) to 3 epochs (2,316 steps) on Kaggle dual T4 GPUs. Romanized nDCG@10 reached 0.3937 (+26.0x over baseline) with 0.5403 Recall@20 (+11.5x gain) while retaining 0.8645 Native Devanagari nDCG@10 (0.9763 Recall@20) and 0.6489 English nDCG@10. Accepted `LoRA Symmetric` 3-epoch checkpoint for ONNX export and in-browser deployment.
 

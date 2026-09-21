@@ -1,6 +1,7 @@
 # Translation project steps
+ 
+Status: Active (21 September 2026). Activated after concluding the embedding project. Initial focus is on Step 1 and Step 2.
 
-Initial roadmap, 15 September 2026. Deferred until the embedding project is complete. The pair and direction remain open, and later steps depend on earlier results.
 
 ## 1. Choose one direction and define success
 

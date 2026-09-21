@@ -1,0 +1,7 @@
+{
+  "command": "python -m indic_edge_embeddings.eval.run_kaggle_full_eval",
+  "executed_command": "python -m indic_edge_embeddings.eval.run_kaggle_full_eval",
+  "exit_code": 1,
+  "duration_seconds": 19973.08,
+  "status": "FAILED"
+}

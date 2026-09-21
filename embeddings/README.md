@@ -6,13 +6,10 @@ The first release should demonstrate either better retrieval at a comparable dow
 
 ## Status
 
-E5-small is selected for the next bounded training pilot. The [Romanization v2 experiment](experiments/2026-09-15-romanization-v2/README.md) repaired script conversion and training/validation leakage, regenerated versioned data, and reran E5. Native nDCG@10 is 0.5513; corrected synthetic Romanized nDCG@10 is 0.0. Training preparation and browser validation remain pending.
+Concluded. The final full-corpus evaluation campaign on the 506k MIRACL benchmark showed that LoRA cross-script adaptation degraded native Devanagari retrieval by 0.0875 nDCG@10 while yielding only 0.1103 nDCG@10 on Romanized queries against 500k distractors. The subproject is closed, and implementation focus has shifted to pair-specific translation in [../translation/](../translation/README.md).
 
-Start with [STEPS.md](STEPS.md). It describes the initial sequence and the decisions that depend on results. Update it after each experiment rather than treating it as a fixed implementation plan.
+Run outputs and experiment records are preserved in [experiments/](experiments/README.md).
 
-Agent workflow is in [AGENTS.md](AGENTS.md). Run outputs and resulting decisions belong in [experiments/](experiments/README.md).
-
-Dataset preparation code is available in the [v3 build guide](configs/README.md), including a matched answer/passage control and an optional mixed-source recipe. Offline implementation checks passed; no production v3 training result is available yet.
 
 ## Scope
 

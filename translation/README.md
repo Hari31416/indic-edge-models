@@ -4,13 +4,12 @@ Build a compact translator for one selected language pair, starting with one dir
 
 ## Status and priority
 
-Deferred until the [embedding project](../embeddings/README.md) is complete. This folder contains planning documents only. Translation is independent of the reranking model; their order after embeddings remains open.
+Active. The embedding project concluded following the full-corpus evaluation campaign. Active development now begins with [STEPS.md](STEPS.md).
 
-No pair, direction, base model, training recipe, or download budget has been finalized. English to Hindi is a provisional example, not a committed choice. Supporting the reverse direction is a separate extension.
-
-Start with [STEPS.md](STEPS.md) when this project becomes active, and revise it using baseline results.
+No pair, direction, base model, training recipe, or download budget has been finalized. English to Hindi is the primary candidate. Supporting the reverse direction is a separate extension.
 
 Agent workflow is in [AGENTS.md](AGENTS.md). Run outputs and resulting decisions belong in [experiments/](experiments/README.md).
+
 
 ## Goal and constraints
 
